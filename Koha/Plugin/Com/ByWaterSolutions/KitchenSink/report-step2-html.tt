@@ -1,0 +1,47 @@
+[% INCLUDE 'doc-head-open.inc' %]
+ <title>Koha: Kitchen Sink Plugin: Report: Patron List</title>
+ <script type="text/javascript" src="[% PLUGIN_PATH %]/datepicker/js/datepicker.js"></script>
+ <link href="[% PLUGIN_PATH %]/datepicker/css/datepicker.css" rel="stylesheet" type="text/css" />
+[% INCLUDE 'doc-head-close.inc' %]
+</head>
+<body>
+[% INCLUDE 'header.inc' %]
+[% INCLUDE 'cat-search.inc' %]
+
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a> &rsaquo; Kitchen Sink &rsaquo; Report &rsaquo; Patron List</div>
+
+<div id="doc3">
+<h5>Library: [% branch %]</h5>
+[% IF category_code %]
+	<h5>Category Code: [% category_code %]</h5>
+[% END %]
+[% IF borrower_municipality %]
+	<h5>Municipality: [% borrower_municipality %]</h5>
+[% END %]
+<h5>Date Ran: [% date_ran %]</h5>
+
+<table border=1>
+  <thead>
+    <tr> 
+      <th>Name</th>
+      <th>Street</th>
+      <th>City</th>  
+      <th>Zip Code</th>
+      <th>Expiration</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    [% FOREACH r IN results_loop %]
+      <tr>
+        <td>[% r.firstname %] [% r.surname %]</td>
+        <td>[% r.address %]</td>
+        <td>[% r.city %]</td>
+        <td>[% r.zipcode %]</td>
+        <td>[% r.dateexpiry %]</td> 
+      </tr>
+    [% END %]
+  </tbody>
+</table> 
+
+[% INCLUDE 'intranet-bottom.inc' %]

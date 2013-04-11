@@ -1,0 +1,90 @@
+[% INCLUDE 'doc-head-open.inc' %]
+ <title>Koha: Kitchen Sink Plugin: Report: Patron List</title>
+ <script type="text/javascript" src="[% PLUGIN_PATH %]/datepicker/js/datepicker.js"></script>
+ <link href="[% PLUGIN_PATH %]/datepicker/css/datepicker.css" rel="stylesheet" type="text/css" />
+[% INCLUDE 'doc-head-close.inc' %]
+</head>
+<body>
+[% INCLUDE 'header.inc' %]
+[% INCLUDE 'cat-search.inc' %]
+
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a> &rsaquo; Kitchen Sink &rsaquo; Report &rsaquo; Patron List</div>
+
+<div id="doc3">
+	<h3>Generate List of Patrons</h3>
+
+        <!-- Notice our form here has no 'action', this is good, it means that our forms will always get passed back to 'plugins/run.pl'. You could hard code it instead if you prefer -->
+	<form method="get">
+                <input type="hidden" name="class" value="[% CLASS %]"/>
+                <input type="hidden" name="method" value="[% METHOD %]"/>
+
+		<label for="branch">Select Library:</label>
+		<select name="branch">
+			[% FOREACH branch IN branches_loop %]
+				<option	value="[% branch.value %]" [% IF branch.selected %]selected="selected"[% END %] >
+					[% branch.branchname %]
+				</option>
+			[% END %]
+		</select>
+
+		<br/><br/>
+
+		<label for="categorycode">Select Patron Category:</label>
+		<select name="categorycode">
+			<option value="%">Any</option>
+			[% FOREACH category IN categories_loop %]
+				<option value="[% category.categorycode %]">[% category.description %]</option>
+			[% END %]
+		</select>
+
+		<br/><br/>
+
+		<p>Expiration Date Range (Optional): <i>(Date Format: MM/DD/YYYY)</i></p>
+
+		<label>Date From:</label>
+		<table class="split-date-wrap" border="0" cellpadding="0" cellspacing="0">
+
+			<tr>
+				<td><input size="2" id="date-from-mm" name="fromMonth" value="" maxlength="2" type="text" />/</td>
+				<td><input size="2" id="date-from-dd" name="fromDay" value="" maxlength="2" type="text" />/</td>
+				<td><input size="4" class="split-date fill-grid statusformat-l-cc-sp-d-sp-F-sp-Y show-weeks" id="date-from" name="fromYear" value="" maxlength="4" type="text" /></td>
+				<td>
+					<a tabindex="0" aria-haspopup="true" role="button" id="fd-but-date-from" title="Show Calendar" class="date-picker-control" href="#date-from">
+						<span>&nbsp;</span>
+					</a>
+
+				</td>
+			</tr>
+		</table>  
+		<br/>
+
+		<label>Date To:</label>
+		<table class="split-date-wrap" border="0" cellpadding="0" cellspacing="0">
+			<tr>
+				<td><input size="2" id="date-to-mm" name="toMonth" value="" maxlength="2" type="text" />/</td>
+					<td><input size="2" id="date-to-dd" name="toDay" value="" maxlength="2" type="text" />/</td>
+				<td><input size="4" class="split-date fill-grid statusformat-l-cc-sp-d-sp-F-sp-Y show-weeks" id="date-to" name="toYear" value="" maxlength="4" type="text" /></td>
+				<td>
+					<a tabindex="0" aria-haspopup="true" role="button" id="fd-but-date-to" title="Show Calendar" class="date-picker-control" href="#date-to">
+						<span>&nbsp;</span>
+					</a>
+				</td>
+			</tr>
+
+		</table>  
+
+		<br/><br/>
+
+		<label for="output">Output Data to:</label>
+		<select name="output">
+			<option value="screen">Display List</option>
+			<option value="csv">CSV File</option>
+		</select>
+
+		<br/><br/>
+
+		<input type="submit" value="Run Report" />
+
+	</form>
+
+[% INCLUDE 'intranet-bottom.inc' %]

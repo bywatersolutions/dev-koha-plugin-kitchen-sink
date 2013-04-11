@@ -1,0 +1,3 @@
+firstname,lastname,street,city,zipcode
+[% FOREACH r IN results_loop %]"[% r.firstname %]","[% r.surname %]","[% r.address %]","[% r.city %]","[% r.zipcode %]"
+[% END %]

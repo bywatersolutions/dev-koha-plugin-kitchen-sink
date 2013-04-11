@@ -1,0 +1,27 @@
+[% INCLUDE 'doc-head-open.inc' %]
+ <title>Koha: Kitchen Sink Plugin: Example Tool</title>
+[% INCLUDE 'doc-head-close.inc' %]
+</head>
+<body>
+[% INCLUDE 'header.inc' %]
+[% INCLUDE 'cat-search.inc' %]
+
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a> &rsaquo; Kitchen Sink &rsaquo; Example Tool</div>
+
+<div id="doc3">
+
+    <p>Hello [% victim.firstname %]! Your new name is Bob!</p>
+
+    [% IF victims %]
+        <h3>Previous victims:</h3>
+
+        <ul>
+            [% FOREACH v IN victims %]
+                <li><a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=[% v.borrowernumber %]">[% v.firstname %] [% v.surname %]</a></li>
+            [% END %]
+        </ul>
+    [% ELSE %]
+        <p>You are the first victim to click the button!</p>
+    [% END %]
+
+[% INCLUDE 'intranet-bottom.inc' %]
