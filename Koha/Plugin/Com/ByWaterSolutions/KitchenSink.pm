@@ -14,7 +14,7 @@ use C4::Auth;
 use MARC::Record;
 
 ## Here we set our plugin version
-our $VERSION = 1.01;
+our $VERSION = 2.00;
 
 ## Here is our metadata, some keys are required, some are optional
 our $metadata = {
