@@ -11,6 +11,7 @@ use C4::Context;
 use C4::Branch;
 use C4::Members;
 use C4::Auth;
+use MARC::Record;
 
 ## Here we set our plugin version
 our $VERSION = 1.01;
@@ -35,6 +36,7 @@ sub new {
 
     ## We need to add our metadata here so our base class can access it
     $args->{'metadata'} = $metadata;
+    $args->{'metadata'}->{'class'} = $class;
 
     ## Here, we call the 'new' method for our base class
     ## This runs some additional magic and checking
@@ -77,6 +79,46 @@ sub tool {
         $self->tool_step2();
     }
 
+}
+
+## The existiance of a 'to_marc' subroutine means the plugin is capable
+## of converting some type of file to MARC for use from the stage records
+## for import tool
+##
+## This example takes a text file of the arbtrary format:
+## First name:Middle initial:Last name:Year of birth:Title
+## and converts each line to a very very basic MARC record
+sub to_marc {
+    my ( $self, $args ) = @_;
+
+    my $data = $args->{data};
+
+    my $batch = q{};
+
+    foreach my $line ( split( /\n/, $data ) ) {
+        my $record = MARC::Record->new();
+        my ( $firstname, $initial, $lastname, $year, $title ) = split(/:/, $line );
+
+        ## create an author field.
+        my $author_field = MARC::Field->new(
+            '100', 1, '',
+            a => "$lastname, $firstname $initial.",
+            d => "$year-"
+        );
+
+        ## create a title field.
+        my $title_field = MARC::Field->new(
+            '245', '1', '4',
+            a => "$title",
+            c => "$firstname $initial. $lastname",
+        );
+
+        $record->append_fields( $author_field, $title_field );
+
+        $batch .= $record->as_usmarc() . "\x1D";
+    }
+
+    return $batch;
 }
 
 ## If your tool is complicated enough to needs it's own setting/configuration
