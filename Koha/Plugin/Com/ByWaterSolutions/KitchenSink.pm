@@ -8,13 +8,14 @@ use base qw(Koha::Plugins::Base);
 
 ## We will also need to include any Koha libraries we want to access
 use C4::Context;
-use C4::Branch;
 use C4::Members;
 use C4::Auth;
+use Koha::Libraries;
+use Koha::Patron::Categories;
 use MARC::Record;
 
 ## Here we set our plugin version
-our $VERSION = 2.00;
+our $VERSION = 2.01;
 
 ## Here is our metadata, some keys are required, some are optional
 our $metadata = {
@@ -23,8 +24,8 @@ our $metadata = {
     description =>
 'This plugin implements every available feature of the plugin system and is mean to be documentation and a starting point for writing your own plugins!',
     date_authored   => '2009-01-27',
-    date_updated    => '2009-01-27',
-    minimum_version => '3.0100107',
+    date_updated    => '2016-09-28',
+    minimum_version => '16.06.00.018',
     maximum_version => undef,
     version         => $VERSION,
 };
@@ -189,9 +190,11 @@ sub report_step1 {
 
     my $template = $self->get_template({ file => 'report-step1.tt' });
 
+    my @libraries = Koha::Libraries->search;
+    my @categories = Koha::Patron::Categories->search_limited({}, {order_by => ['description']});
     $template->param(
-        branches_loop   => GetBranchesLoop(),
-        categories_loop => GetBorrowercategoryList(),
+        libraries => \@libraries,
+        categories => \@categories,
     );
 
     print $cgi->header();
