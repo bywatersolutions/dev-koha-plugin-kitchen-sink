@@ -20,9 +20,9 @@
 
 		<label for="branch">Select Library:</label>
 		<select name="branch">
-			[% FOREACH branch IN branches_loop %]
-				<option	value="[% branch.value %]" [% IF branch.selected %]selected="selected"[% END %] >
-					[% branch.branchname %]
+			[% FOREACH library IN libraries %]
+				<option	value="[% library.branchcode %]">
+					[% library.branchname %]
 				</option>
 			[% END %]
 		</select>
@@ -32,7 +32,7 @@
 		<label for="categorycode">Select Patron Category:</label>
 		<select name="categorycode">
 			<option value="%">Any</option>
-			[% FOREACH category IN categories_loop %]
+			[% FOREACH category IN categories %]
 				<option value="[% category.categorycode %]">[% category.description %]</option>
 			[% END %]
 		</select>
