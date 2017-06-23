@@ -1,3 +1,4 @@
+[% USE KohaDates %]
 [% INCLUDE 'doc-head-open.inc' %]
  <title>Koha: Kitchen Sink Plugin: Report: Patron List</title>
  <script type="text/javascript" src="[% PLUGIN_PATH %]/datepicker/js/datepicker.js"></script>
@@ -18,7 +19,7 @@
 [% IF borrower_municipality %]
 	<h5>Municipality: [% borrower_municipality %]</h5>
 [% END %]
-<h5>Date Ran: [% date_ran %]</h5>
+<h5>Date Ran: [% date_ran | $KohaDates %]</h5>
 
 <table border=1>
   <thead>
@@ -38,7 +39,7 @@
         <td>[% r.address %]</td>
         <td>[% r.city %]</td>
         <td>[% r.zipcode %]</td>
-        <td>[% r.dateexpiry %]</td> 
+        <td>[% r.dateexpiry | $KohaDates %]</td> 
       </tr>
     [% END %]
   </tbody>

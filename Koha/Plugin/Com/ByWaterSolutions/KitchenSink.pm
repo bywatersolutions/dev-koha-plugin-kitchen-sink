@@ -10,6 +10,7 @@ use base qw(Koha::Plugins::Base);
 use C4::Context;
 use C4::Members;
 use C4::Auth;
+use Koha::DateUtils;
 use Koha::Libraries;
 use Koha::Patron::Categories;
 use MARC::Record;
@@ -245,12 +246,8 @@ sub report_step2 {
 
     my @results;
     while ( my $row = $sth->fetchrow_hashref() ) {
-        $row->{'dateexpiry'} =
-          C4::Dates->new( $row->{'dateexpiry'}, 'iso' )->output();
         push( @results, $row );
     }
-
-    my $date = C4::Dates->new();
 
     my $filename;
     if ( $output eq "csv" ) {
@@ -265,7 +262,7 @@ sub report_step2 {
     my $template = $self->get_template({ file => $filename });
  
     $template->param(
-        date_ran     => C4::Dates->new()->output(),
+        date_ran     => dt_from_string(),
         results_loop => \@results,
         branch       => GetBranchName($branch),
     );
