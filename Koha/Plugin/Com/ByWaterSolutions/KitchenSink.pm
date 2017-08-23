@@ -13,22 +13,28 @@ use C4::Auth;
 use Koha::DateUtils;
 use Koha::Libraries;
 use Koha::Patron::Categories;
+use Koha::Account;
+use Koha::Account::Lines;
 use MARC::Record;
+use Cwd qw(abs_path);
+use URI::Escape qw(uri_unescape);
+use LWP::UserAgent;
 
 ## Here we set our plugin version
-our $VERSION = 2.01;
+our $VERSION = "{VERSION}";
 
 ## Here is our metadata, some keys are required, some are optional
 our $metadata = {
-    name   => 'Example Kitchen-Sink Plugin',
-    author => 'Kyle M Hall',
-    description =>
-'This plugin implements every available feature of the plugin system and is mean to be documentation and a starting point for writing your own plugins!',
+    name            => 'Example Kitchen-Sink Plugin',
+    author          => 'Kyle M Hall',
     date_authored   => '2009-01-27',
-    date_updated    => '2016-09-28',
+    date_updated    => "1900-01-01",
     minimum_version => '16.06.00.018',
     maximum_version => undef,
     version         => $VERSION,
+    description     => 'This plugin implements every available feature '
+      . 'of the plugin system and is meant '
+      . 'to be documentation and a starting point for writing your own plugins!',
 };
 
 ## This is the minimum code required for a plugin's 'new' method
@@ -123,6 +129,106 @@ sub to_marc {
     return $batch;
 }
 
+## If your plugin can process payments online,
+## and that feature of the plugin is enabled,
+## this method will return true
+sub opac_online_payment {
+    my ( $self, $args ) = @_;
+
+    return $self->retrieve_data('enable_opac_payments') eq 'Yes';
+}
+
+## This method triggers the beginning of the payment process
+## It could result in a form displayed to the patron the is submitted
+## or go straight to a redirect to the payment service ala paypal
+sub opac_online_payment_begin {
+    my ( $self, $args ) = @_;
+    my $cgi = $self->{'cgi'};
+
+    my ( $template, $borrowernumber ) = get_template_and_user(
+        {   template_name   => abs_path( $self->mbf_path( 'opac_online_payment_begin.tt' ) ),
+            query           => $cgi,
+            type            => 'opac',
+            authnotrequired => 0,
+            is_plugin       => 1,
+        }
+    );
+
+    my @accountline_ids = $cgi->multi_param('accountline');
+
+    my $rs = Koha::Database->new()->schema()->resultset('Accountline');
+    my @accountlines = map { $rs->find($_) } @accountline_ids;
+
+    $template->param(
+        borrower             => scalar Koha::Patrons->find($borrowernumber),
+        payment_method       => scalar $cgi->param('payment_method'),
+        enable_opac_payments => $self->retrieve_data('enable_opac_payments'),
+        accountlines         => \@accountlines,
+    );
+
+
+    print $cgi->header();
+    print $template->output();
+}
+
+## This method triggers the end of the payment process
+## Should should result in displaying a page indicating
+## the success or failure of the payment.
+sub opac_online_payment_end {
+    my ( $self, $args ) = @_;
+    my $cgi = $self->{'cgi'};
+
+    my ( $template, $borrowernumber ) = get_template_and_user(
+        {
+            template_name =>
+              abs_path( $self->mbf_path('opac_online_payment_end.tt') ),
+            query           => $cgi,
+            type            => 'opac',
+            authnotrequired => 0,
+            is_plugin       => 1,
+        }
+    );
+
+    my $m;
+    my $v;
+
+    my $amount          = $cgi->param('amount');
+    my @accountline_ids = $cgi->multi_param('accountlines_id');
+
+    $m = "no_amount"       unless $amount;
+    $m = "no_accountlines" unless @accountline_ids;
+
+    if ( $amount && @accountline_ids ) {
+        my $account = Koha::Account->new( { patron_id => $borrowernumber } );
+        my @accountlines = Koha::Account::Lines->search(
+            {
+                accountlines_id => { -in => \@accountline_ids }
+            }
+        )->as_list();
+        foreach my $id (@accountline_ids) {
+            $account->pay(
+                {
+                    amount => $amount,
+                    lines  => \@accountlines,
+                    note   => "Paid via KitchenSink ImaginaryPay",
+                }
+            );
+        }
+
+        $m = 'valid_payment';
+        $v = $amount;
+    }
+
+    $template->param(
+        borrower      => scalar Koha::Patrons->find($borrowernumber),
+        message       => $m,
+        message_value => $v,
+    );
+
+    print $cgi->header();
+    print $template->output();
+}
+
 ## If your tool is complicated enough to needs it's own setting/configuration
 ## you will want to add a 'configure' method to your plugin like so.
 ## Here I am throwing all the logic into the 'configure' method, but it could
@@ -136,8 +242,9 @@ sub configure {
 
         ## Grab the values we already have for our settings, if any exist
         $template->param(
-            foo => $self->retrieve_data('foo'),
-            bar => $self->retrieve_data('bar'),
+            enable_opac_payments => $self->retrieve_data('enable_opac_payments'),
+            foo             => $self->retrieve_data('foo'),
+            bar             => $self->retrieve_data('bar'),
         );
 
         print $cgi->header();
@@ -146,6 +253,7 @@ sub configure {
     else {
         $self->store_data(
             {
+                enable_opac_payments => $cgi->param('enable_opac_payments'),
                 foo                => $cgi->param('foo'),
                 bar                => $cgi->param('bar'),
                 last_configured_by => C4::Context->userenv->{'number'},
@@ -260,7 +368,7 @@ sub report_step2 {
     }
 
     my $template = $self->get_template({ file => $filename });
- 
+
     $template->param(
         date_ran     => dt_from_string(),
         results_loop => \@results,
@@ -307,7 +415,7 @@ sub tool_step2 {
         push( @victims, GetMember( borrowernumber => $r->{'borrowernumber'} ) );
     }
     $template->param( 'victims' => \@victims );
-    
+
     $dbh->do( "INSERT INTO $table ( borrowernumber ) VALUES ( ? )",
         undef, ($borrowernumber) );
 

@@ -1,0 +1,98 @@
+[% USE Koha %]
+[% USE KohaDates %]
+
+[% INCLUDE 'doc-head-open.inc' %][% IF ( LibraryNameTitle ) %][% LibraryNameTitle %][% ELSE %]Koha online[% END %] catalog &rsaquo; Pay your fines and charges
+[% INCLUDE 'doc-head-close.inc' %]
+[% BLOCK cssinclude %][% END %]
+</head>
+<body id="opac-account" class="scrollto">
+[% INCLUDE 'masthead.inc' %]
+
+<div class="main">
+    <ul class="breadcrumb">
+        <li><a href="/cgi-bin/koha/opac-main.pl">Home</a> <span class="divider">&rsaquo;</span></li>
+        <li><a href="/cgi-bin/koha/opac-user.pl">[% borrower.firstname %] [% borrower.surname %]</a><span class="divider">&rsaquo;</span></li>
+        <li><a href="#">Pay your fines and charges</a></li>
+    </ul>
+
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span2">
+                <div id="navigation">
+                    [% INCLUDE 'navigation.inc' IsPatronPage=1 %]
+                </div>
+            </div>
+            <div class="span10">
+                <div id="useraccount" class="maincontent">
+                    <p>
+                        You are about to initiate a payment for the following fees to your library via KitchenSink ImaginaryPay.
+                        Do you wish to proceed?
+                    </p>
+
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Description
+                                </th>
+
+                                <th>
+                                    Amount to pay
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            [% SET total = 0 %]
+                            [% FOREACH a IN accountlines %]
+                                [% total = total + a.amountoutstanding %]
+                                <tr>
+                                    <td>
+                                        [% a.description | html %]
+                                    </td>
+
+                                    <td>
+                                        [% a.amountoutstanding | format('%.2f') %]
+                                    </td>
+                            [% END %]
+                        </tbody>
+
+                        <tfoot>
+                            <tr>
+                                <th>
+                                    Total to pay
+                                </th>
+
+                                <th>
+                                    [% total | format('%.2f') %]
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+
+                    <form method="post" action="[% OPACBaseURL %]/cgi-bin/koha/opac-account-pay-return.pl">
+                        <input type="hidden" name="BillingAddress" value="[% borrower.address %]" />
+                        <input type="hidden" name="BillingName" value="[% borrower.firstname %] [% borrower.surname %]" />
+                        <input type="hidden" name="BillingCountry" value="US" />
+                        <input type="hidden" name="BillingCity" value="[% borrower.city %]" />
+                        <input type="hidden" name="BillingState" value="[% borrower.state %]" />
+                        <input type="hidden" name="BillingPostalCode" value="[% borrower.zipcode %]" />
+                        <input type="hidden" name="BillingEmail" value="[% borrower.email %]" />
+                        <input type="hidden" name="amount" value="[% total | format('%.2f') %]" />
+                        <input type="hidden" name="payment_method" value="Koha::Plugin::Com::ByWaterSolutions::KitchenSink" />
+
+                        [% FOREACH a IN accountlines %]
+                            <input type="hidden" name="accountlines_id" value="[% a.id %]" />
+                        [% END %]
+
+                        <input type="submit" class="btn" value="Yes, proceed with payment" />
+                    </form>
+                </div> <!-- / #useraccount -->
+            </div> <!-- / .span10 -->
+        </div> <!-- / .row-fluid -->
+    </div> <!-- / .container-fluid -->
+</div> <!-- / .main -->
+
+[% INCLUDE 'opac-bottom.inc' %]
+[% BLOCK jsinclude %][% END %]

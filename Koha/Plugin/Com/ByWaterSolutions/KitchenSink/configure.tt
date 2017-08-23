@@ -41,6 +41,23 @@
 
         <p>
 
+        <label for="enable_opac_payments">Enable OPAC Account Payments: </label>
+        <select name="enable_opac_payments">
+            [% IF enable_opac_payments == 'No' %]
+                <option value="No" selected="selected">No</option>
+            [% ELSE %]
+                <option value="No">No</option>
+            [% END %]
+
+            [% IF enable_opac_payments == 'Yes' %]
+                <option value="Yes" selected="selected">Yes</option>
+            [% ELSE %]
+                <option value="Yes">Yes</option>
+            [% END %]
+        </select>
+
+        <p>
+
         <input type="hidden" name="save" value="1" />
 
         <input type="submit" value="Save configuration" />
