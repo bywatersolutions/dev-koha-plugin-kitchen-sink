@@ -1,0 +1,106 @@
+[% USE Koha %]
+[% USE KohaDates %]
+
+[% INCLUDE 'doc-head-open.inc' %][% IF ( LibraryNameTitle ) %][% LibraryNameTitle %][% ELSE %]Koha online[% END %] catalog &rsaquo; Pay your fines and charges
+[% INCLUDE 'doc-head-close.inc' %]
+[% BLOCK cssinclude %][% END %]
+</head>
+<body id="opac-account" class="scrollto">
+[% INCLUDE 'masthead.inc' %]
+
+<div class="main">
+    <ul class="breadcrumb">
+        <li><a href="/cgi-bin/koha/opac-main.pl">Home</a> <span class="divider">&rsaquo;</span></li>
+        <li><a href="/cgi-bin/koha/opac-user.pl">[% borrower.firstname %] [% borrower.surname %]</a><span class="divider">&rsaquo;</span></li>
+        <li><a href="#">Pay your fines and charges</a></li>
+    </ul>
+
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span2">
+                <div id="navigation">
+                    [% INCLUDE 'navigation.inc' IsPatronPage=1 %]
+                </div>
+            </div>
+            <div class="span10">
+                <div id="useraccount" class="maincontent">
+                    <p>
+                        You are about to initiate a payment for the following fees to your library via FIS PayDirect.
+                        Do you wish to begin?
+                    </p>
+
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Description
+                                </th>
+
+                                <th>
+                                    Amount to pay
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            [% SET total = 0 %]
+                            [% FOREACH a IN accountlines %]
+                                [% total = total + a.amountoutstanding %]
+                                <tr>
+                                    <td>
+                                        [% a.description | html %]
+                                    </td>
+
+                                    <td>
+                                        [% a.amountoutstanding | format('%.2f') %]
+                                    </td>
+                            [% END %]
+                        </tbody>
+
+                        <tfoot>
+                            <tr>
+                                <th>
+                                    Total to pay
+                                </th>
+
+                                <th>
+                                    [% total | format('%.2f') %]
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+
+                    <form method="post" action="[% FisPostUrl %]">
+                        <input type="hidden" name="MerchantCode" value="[% FisMerchantCode %]" />
+                        <input type="hidden" name="SettleCode" value="[% FisSettleCode %]" />
+                        <input type="hidden" name="PaymentMethod" value="CreditOrDebit" />
+                        <input type="hidden" name="ReturnUrl" value="[% OPACBaseURL %]/cgi-bin/koha/opac-account-pay-fis-return.pl" />
+                        <input type="hidden" name="CancelUrl" value="[% OPACBaseURL %]/cgi-bin/koha/opac-account.pl" />
+
+                        <input type="hidden" name="UserPart1" value="[% borrower.firstname %]" />
+                        <input type="hidden" name="UserPart2" value="[% borrower.surname %]" />
+                        <input type="hidden" name="UserPart3" value="[% borrower.borrowernumber %]" />
+
+                        <input type="hidden" name="BillingAddress" value="[% borrower.address %]" />
+                        <input type="hidden" name="BillingName" value="[% borrower.firstname %] [% borrower.surname %]" />
+                        <input type="hidden" name="BillingCountry" value="US" />
+                        <input type="hidden" name="BillingCity" value="[% borrower.city %]" />
+                        <input type="hidden" name="BillingState" value="[% borrower.state %]" />
+                        <input type="hidden" name="BillingPostalCode" value="[% borrower.zipcode %]" />
+                        <input type="hidden" name="BillingEmail" value="[% borrower.email %]" />
+
+                        [% SET i = 0 %]
+                        [% UNLESS a.description %][% SET a.description = 'No description' %][% END %]
+                        <input type="hidden" name="LineItems" value="[% FOREACH a IN accountlines %][% i = i + 1 %][[% i %]*[% a.accountlines_id %]*[% a.description | html %]*[% a.amountoutstanding %]][% IF !loop.last %],[% END %][% END %]" />
+
+                        <input type="submit" class="btn" value="Yes, proceed with payment" />
+                    </form>
+                </div> <!-- / #useraccount -->
+            </div> <!-- / .span10 -->
+        </div> <!-- / .row-fluid -->
+    </div> <!-- / .container-fluid -->
+</div> <!-- / .main -->
+
+[% INCLUDE 'opac-bottom.inc' %]
+[% BLOCK jsinclude %][% END %]

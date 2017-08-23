@@ -13,7 +13,12 @@ use C4::Auth;
 use Koha::DateUtils;
 use Koha::Libraries;
 use Koha::Patron::Categories;
+use Koha::Account;
+use Koha::Account::Lines;
 use MARC::Record;
+use Cwd qw(abs_path);
+use URI::Escape qw(uri_unescape);
+use LWP::UserAgent;
 
 ## Here we set our plugin version
 our $VERSION = 2.01;
@@ -123,6 +128,160 @@ sub to_marc {
     return $batch;
 }
 
+## If your plugin can process payments online,
+## and that feature of the plugin is enabled,
+## this method will return true
+sub opac_online_payment {
+    my ( $self, $args ) = @_;
+
+    return $self->retrieve_data('enable_opac_payments') eq 'Yes';
+}
+
+## This method triggers the beginning of the payment process
+## It could result in a form displayed to the patron the is submitted
+## or go straight to a redirect to the payment service ala paypal
+sub opac_online_payment_begin {
+    my ( $self, $args ) = @_;
+    my $cgi = $self->{'cgi'};
+
+    my ( $template, $borrowernumber ) = get_template_and_user(
+        {   template_name   => abs_path( $self->mbf_path( 'opac_online_payment_begin.tt' ) ),
+            query           => $cgi,
+            type            => 'opac',
+            authnotrequired => 0,
+            is_plugin       => 1,
+        }
+    );
+
+    my @accountline_ids = $cgi->multi_param('accountline');
+
+    my $rs = Koha::Database->new()->schema()->resultset('Accountline');
+    my @accountlines = map { $rs->find($_) } @accountline_ids;
+
+    $template->param(
+        borrower             => scalar Koha::Patrons->find($borrowernumber),
+        payment_method       => scalar $cgi->param('payment_method'),
+        enable_opac_payments => $self->retrieve_data('enable_opac_payments'),
+        FisPostUrl           => $self->retrieve_data('FisPostUrl'),
+        FisMerchantCode      => $self->retrieve_data('FisMerchantCode'),
+        FisSettleCode        => $self->retrieve_data('FisSettleCode'),
+        FisApiUrl            => $self->retrieve_data('FisApiUrl'),
+        FisApiPassword       => $self->retrieve_data('FisApiPassword'),
+        accountlines         => \@accountlines,
+    );
+
+
+    print $cgi->header();
+    print $template->output();
+}
+
+## This method triggers the end of the payment process
+## Should should result in displaying a page indicating
+## the success or failure of the payment.
+sub opac_online_payment_end {
+    my ( $self, $args ) = @_;
+    my $cgi = $self->{'cgi'};
+
+    my ( $template, $borrowernumber ) = get_template_and_user(
+        {
+            template_name => abs_path( $self->mbf_path('opac_online_payment_end.tt') ),
+            cgi           => $cgi,
+            type            => 'opac',
+            authnotrequired => 0,
+            is_plugin       => 1,
+        }
+    );
+
+    my $transaction_id = $cgi->param('TransactionId');
+
+    my $merchant_code =
+      C4::Context->preference('FisMerchantCode');    #33WSH-LIBRA-PDWEB-W
+    my $settle_code =
+      C4::Context->preference('FisSettleCode');      #33WSH-LIBRA-PDWEB-00
+    my $password = C4::Context->preference('FisApiPassword');    #testpass;
+
+    my $ua  = LWP::UserAgent->new;
+    my $url = C4::Context->preference('FisApiUrl')
+      ;    #https://paydirectapi.ca.link2gov.com/ProcessTransactionStatus;
+    my $response = $ua->post(
+        $url,
+        {
+            L2GMerchantCode       => $merchant_code,
+            Password              => $password,
+            SettleMerchantCode    => $settle_code,
+            OriginalTransactionId => $transaction_id,
+        }
+    );
+
+    my ( $m, $v );
+
+    if ( $response->is_success ) {
+        my @params = split( '&', uri_unescape( $response->decoded_content ) );
+        my $params;
+        foreach my $p (@params) {
+            my ( $key, $value ) = split( '=', $p );
+            $params->{$key} = $value // q{};
+        }
+
+        if ( $params->{TransactionID} eq $transaction_id ) {
+
+            my $note = "FIS ( $transaction_id  )";
+
+            unless ( Koha::Account::Lines->search( { note => $note } )->count() ) {
+
+                my @line_items = split( /,/, $cgi->param('LineItems') );
+
+                my @paid;
+                my $account = Koha::Account->new( { patron_id => $borrowernumber } );
+                foreach my $l (@line_items) {
+                    $l = substr( $l, 1, length($l) - 2 );
+                    my ( undef, $id, $description, $amount ) =
+                      split( /[\*,\~]/, $l );
+                    push(
+                        @paid,
+                        {
+                            accountlines_id => $id,
+                            description     => $description,
+                            amount          => $amount
+                        }
+                    );
+
+                    $account->pay(
+                        {
+                            amount     => $amount,
+                            lines      => [ scalar Koha::Account::Lines->find($id) ],
+                            note       => $note,
+                        }
+                    );
+                }
+
+                $m = 'valid_payment';
+                $v = $params->{TransactionAmount};
+            }
+            else {
+                $m = 'duplicate_payment';
+                $v = $transaction_id;
+            }
+        }
+        else {
+            $m = 'invalid_payment';
+            $v = $transaction_id;
+        }
+    }
+    else {
+        die( $response->status_line );
+    }
+
+    $template->param(
+        borrower      => scalar Koha::Patrons->find($borrowernumber),
+        message       => $m,
+        message_value => $v,
+    );
+
+    print $cgi->header();
+    print $template->output();
+}
+
 ## If your tool is complicated enough to needs it's own setting/configuration
 ## you will want to add a 'configure' method to your plugin like so.
 ## Here I am throwing all the logic into the 'configure' method, but it could
@@ -136,8 +295,14 @@ sub configure {
 
         ## Grab the values we already have for our settings, if any exist
         $template->param(
-            foo => $self->retrieve_data('foo'),
-            bar => $self->retrieve_data('bar'),
+            enable_opac_payments => $self->retrieve_data('enable_opac_payments'),
+            foo             => $self->retrieve_data('foo'),
+            bar             => $self->retrieve_data('bar'),
+            FisPostUrl      => $self->retrieve_data('FisPostUrl'),
+            FisMerchantCode => $self->retrieve_data('FisMerchantCode'),
+            FisSettleCode   => $self->retrieve_data('FisSettleCode'),
+            FisApiUrl       => $self->retrieve_data('FisApiUrl'),
+            FisApiPassword  => $self->retrieve_data('FisApiPassword'),
         );
 
         print $cgi->header();
@@ -146,8 +311,14 @@ sub configure {
     else {
         $self->store_data(
             {
+                enable_opac_payments => $cgi->param('enable_opac_payments'),
                 foo                => $cgi->param('foo'),
                 bar                => $cgi->param('bar'),
+                FisPostUrl         => $cgi->param('FisPostUrl'),
+                FisMerchantCode    => $cgi->param('FisMerchantCode'),
+                FisSettleCode      => $cgi->param('FisSettleCode'),
+                FisApiUrl          => $cgi->param('FisApiUrl'),
+                FisApiPassword     => $cgi->param('FisApiPassword'),
                 last_configured_by => C4::Context->userenv->{'number'},
             }
         );
@@ -260,7 +431,7 @@ sub report_step2 {
     }
 
     my $template = $self->get_template({ file => $filename });
- 
+
     $template->param(
         date_ran     => dt_from_string(),
         results_loop => \@results,
