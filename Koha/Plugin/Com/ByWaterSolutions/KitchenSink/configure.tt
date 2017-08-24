@@ -58,31 +58,6 @@
 
         <p>
 
-        <label for="FisPostUrl">FIS Post URL: </label>
-        <input type="text" name="FisPostUrl" value="[% FisPostUrl %]" />
-
-        <p>
-
-        <label for="FisMerchantCode">FIS Merchant Code: </label>
-        <input type="text" name="FisMerchantCode" value="[% FisMerchantCode %]" />
-
-        <p>
-
-        <label for="FisSettleCode">FIS Settle Code: </label>
-        <input type="text" name="FisSettleCode" value="[% FisSettleCode %]" />
-
-        <p>
-
-        <label for="FisApiUrl">FIS API URL: </label>
-        <input type="text" name="FisApiUrl" value="[% FisApiUrl %]" />
-
-        <p>
-
-        <label for="FisApiPassword">FIS API Password: </label>
-        <input type="text" name="FisApiPassword" value="[% FisApiPassword %]" />
-
-        <p>
-
         <input type="hidden" name="save" value="1" />
 
         <input type="submit" value="Save configuration" />

@@ -21,19 +21,20 @@ use URI::Escape qw(uri_unescape);
 use LWP::UserAgent;
 
 ## Here we set our plugin version
-our $VERSION = 2.01;
+our $VERSION = "{VERSION}";
 
 ## Here is our metadata, some keys are required, some are optional
 our $metadata = {
-    name   => 'Example Kitchen-Sink Plugin',
-    author => 'Kyle M Hall',
-    description =>
-'This plugin implements every available feature of the plugin system and is mean to be documentation and a starting point for writing your own plugins!',
+    name            => 'Example Kitchen-Sink Plugin',
+    author          => 'Kyle M Hall',
     date_authored   => '2009-01-27',
-    date_updated    => '2016-09-28',
+    date_updated    => "1900-01-01",
     minimum_version => '16.06.00.018',
     maximum_version => undef,
     version         => $VERSION,
+    description     => 'This plugin implements every available feature '
+      . 'of the plugin system and is meant '
+      . 'to be documentation and a starting point for writing your own plugins!',
 };
 
 ## This is the minimum code required for a plugin's 'new' method
@@ -162,11 +163,6 @@ sub opac_online_payment_begin {
         borrower             => scalar Koha::Patrons->find($borrowernumber),
         payment_method       => scalar $cgi->param('payment_method'),
         enable_opac_payments => $self->retrieve_data('enable_opac_payments'),
-        FisPostUrl           => $self->retrieve_data('FisPostUrl'),
-        FisMerchantCode      => $self->retrieve_data('FisMerchantCode'),
-        FisSettleCode        => $self->retrieve_data('FisSettleCode'),
-        FisApiUrl            => $self->retrieve_data('FisApiUrl'),
-        FisApiPassword       => $self->retrieve_data('FisApiPassword'),
         accountlines         => \@accountlines,
     );
 
@@ -184,92 +180,43 @@ sub opac_online_payment_end {
 
     my ( $template, $borrowernumber ) = get_template_and_user(
         {
-            template_name => abs_path( $self->mbf_path('opac_online_payment_end.tt') ),
-            cgi           => $cgi,
+            template_name =>
+              abs_path( $self->mbf_path('opac_online_payment_end.tt') ),
+            query           => $cgi,
             type            => 'opac',
             authnotrequired => 0,
             is_plugin       => 1,
         }
     );
 
-    my $transaction_id = $cgi->param('TransactionId');
+    my $m;
+    my $v;
 
-    my $merchant_code =
-      C4::Context->preference('FisMerchantCode');    #33WSH-LIBRA-PDWEB-W
-    my $settle_code =
-      C4::Context->preference('FisSettleCode');      #33WSH-LIBRA-PDWEB-00
-    my $password = C4::Context->preference('FisApiPassword');    #testpass;
+    my $amount          = $cgi->param('amount');
+    my @accountline_ids = $cgi->multi_param('accountlines_id');
 
-    my $ua  = LWP::UserAgent->new;
-    my $url = C4::Context->preference('FisApiUrl')
-      ;    #https://paydirectapi.ca.link2gov.com/ProcessTransactionStatus;
-    my $response = $ua->post(
-        $url,
-        {
-            L2GMerchantCode       => $merchant_code,
-            Password              => $password,
-            SettleMerchantCode    => $settle_code,
-            OriginalTransactionId => $transaction_id,
-        }
-    );
+    $m = "no_amount"       unless $amount;
+    $m = "no_accountlines" unless @accountline_ids;
 
-    my ( $m, $v );
-
-    if ( $response->is_success ) {
-        my @params = split( '&', uri_unescape( $response->decoded_content ) );
-        my $params;
-        foreach my $p (@params) {
-            my ( $key, $value ) = split( '=', $p );
-            $params->{$key} = $value // q{};
-        }
-
-        if ( $params->{TransactionID} eq $transaction_id ) {
-
-            my $note = "FIS ( $transaction_id  )";
-
-            unless ( Koha::Account::Lines->search( { note => $note } )->count() ) {
-
-                my @line_items = split( /,/, $cgi->param('LineItems') );
-
-                my @paid;
-                my $account = Koha::Account->new( { patron_id => $borrowernumber } );
-                foreach my $l (@line_items) {
-                    $l = substr( $l, 1, length($l) - 2 );
-                    my ( undef, $id, $description, $amount ) =
-                      split( /[\*,\~]/, $l );
-                    push(
-                        @paid,
-                        {
-                            accountlines_id => $id,
-                            description     => $description,
-                            amount          => $amount
-                        }
-                    );
-
-                    $account->pay(
-                        {
-                            amount     => $amount,
-                            lines      => [ scalar Koha::Account::Lines->find($id) ],
-                            note       => $note,
-                        }
-                    );
+    if ( $amount && @accountline_ids ) {
+        my $account = Koha::Account->new( { patron_id => $borrowernumber } );
+        my @accountlines = Koha::Account::Lines->search(
+            {
+                accountlines_id => { -in => \@accountline_ids }
+            }
+        )->as_list();
+        foreach my $id (@accountline_ids) {
+            $account->pay(
+                {
+                    amount => $amount,
+                    lines  => \@accountlines,
+                    note   => "Paid via KitchenSink ImaginaryPay",
                 }
+            );
+        }
 
-                $m = 'valid_payment';
-                $v = $params->{TransactionAmount};
-            }
-            else {
-                $m = 'duplicate_payment';
-                $v = $transaction_id;
-            }
-        }
-        else {
-            $m = 'invalid_payment';
-            $v = $transaction_id;
-        }
-    }
-    else {
-        die( $response->status_line );
+        $m = 'valid_payment';
+        $v = $amount;
     }
 
     $template->param(
@@ -298,11 +245,6 @@ sub configure {
             enable_opac_payments => $self->retrieve_data('enable_opac_payments'),
             foo             => $self->retrieve_data('foo'),
             bar             => $self->retrieve_data('bar'),
-            FisPostUrl      => $self->retrieve_data('FisPostUrl'),
-            FisMerchantCode => $self->retrieve_data('FisMerchantCode'),
-            FisSettleCode   => $self->retrieve_data('FisSettleCode'),
-            FisApiUrl       => $self->retrieve_data('FisApiUrl'),
-            FisApiPassword  => $self->retrieve_data('FisApiPassword'),
         );
 
         print $cgi->header();
@@ -314,11 +256,6 @@ sub configure {
                 enable_opac_payments => $cgi->param('enable_opac_payments'),
                 foo                => $cgi->param('foo'),
                 bar                => $cgi->param('bar'),
-                FisPostUrl         => $cgi->param('FisPostUrl'),
-                FisMerchantCode    => $cgi->param('FisMerchantCode'),
-                FisSettleCode      => $cgi->param('FisSettleCode'),
-                FisApiUrl          => $cgi->param('FisApiUrl'),
-                FisApiPassword     => $cgi->param('FisApiPassword'),
                 last_configured_by => C4::Context->userenv->{'number'},
             }
         );
@@ -478,7 +415,7 @@ sub tool_step2 {
         push( @victims, GetMember( borrowernumber => $r->{'borrowernumber'} ) );
     }
     $template->param( 'victims' => \@victims );
-    
+
     $dbh->do( "INSERT INTO $table ( borrowernumber ) VALUES ( ? )",
         undef, ($borrowernumber) );
 

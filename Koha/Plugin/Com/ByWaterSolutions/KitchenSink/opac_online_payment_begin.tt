@@ -25,8 +25,8 @@
             <div class="span10">
                 <div id="useraccount" class="maincontent">
                     <p>
-                        You are about to initiate a payment for the following fees to your library via FIS PayDirect.
-                        Do you wish to begin?
+                        You are about to initiate a payment for the following fees to your library via KitchenSink ImaginaryPay.
+                        Do you wish to proceed?
                     </p>
 
                     <table class="table table-bordered table-striped">
@@ -71,17 +71,7 @@
                     </table>
 
 
-                    <form method="post" action="[% FisPostUrl %]">
-                        <input type="hidden" name="MerchantCode" value="[% FisMerchantCode %]" />
-                        <input type="hidden" name="SettleCode" value="[% FisSettleCode %]" />
-                        <input type="hidden" name="PaymentMethod" value="CreditOrDebit" />
-                        <input type="hidden" name="ReturnUrl" value="[% OPACBaseURL %]/cgi-bin/koha/opac-account-pay-fis-return.pl" />
-                        <input type="hidden" name="CancelUrl" value="[% OPACBaseURL %]/cgi-bin/koha/opac-account.pl" />
-
-                        <input type="hidden" name="UserPart1" value="[% borrower.firstname %]" />
-                        <input type="hidden" name="UserPart2" value="[% borrower.surname %]" />
-                        <input type="hidden" name="UserPart3" value="[% borrower.borrowernumber %]" />
-
+                    <form method="post" action="[% OPACBaseURL %]/cgi-bin/koha/opac-account-pay-return.pl">
                         <input type="hidden" name="BillingAddress" value="[% borrower.address %]" />
                         <input type="hidden" name="BillingName" value="[% borrower.firstname %] [% borrower.surname %]" />
                         <input type="hidden" name="BillingCountry" value="US" />
@@ -89,10 +79,12 @@
                         <input type="hidden" name="BillingState" value="[% borrower.state %]" />
                         <input type="hidden" name="BillingPostalCode" value="[% borrower.zipcode %]" />
                         <input type="hidden" name="BillingEmail" value="[% borrower.email %]" />
+                        <input type="hidden" name="amount" value="[% total | format('%.2f') %]" />
+                        <input type="hidden" name="payment_method" value="Koha::Plugin::Com::ByWaterSolutions::KitchenSink" />
 
-                        [% SET i = 0 %]
-                        [% UNLESS a.description %][% SET a.description = 'No description' %][% END %]
-                        <input type="hidden" name="LineItems" value="[% FOREACH a IN accountlines %][% i = i + 1 %][[% i %]*[% a.accountlines_id %]*[% a.description | html %]*[% a.amountoutstanding %]][% IF !loop.last %],[% END %][% END %]" />
+                        [% FOREACH a IN accountlines %]
+                            <input type="hidden" name="accountlines_id" value="[% a.id %]" />
+                        [% END %]
 
                         <input type="submit" class="btn" value="Yes, proceed with payment" />
                     </form>
