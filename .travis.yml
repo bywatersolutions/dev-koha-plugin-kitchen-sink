@@ -1,0 +1,20 @@
+language: node_js
+node_js:
+  - "8"
+
+install:
+  # Stop here if the last commit was an auto-release
+  - git log -1 --pretty=oneline | grep -v 'Version auto-incremented'
+
+before_script:
+  - npm install -g gulp-cli
+  - npm install jsonfile
+
+script:
+  - git log -1 --pretty=oneline | grep 'Version auto-incremented' || node increment_version.js
+  - git commit -a -m 'Version auto-incremented'
+  - gulp build
+  - gulp release
+  - git remote add github https://$GH_TOKEN@github.com/bywatersolutions/koha-plugin-kitchen-sink
+  - git push github HEAD:master
+
