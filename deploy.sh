@@ -6,7 +6,7 @@ then
   then
     echo "Building release"
     node increment_version.js
-    git commit -a -m "Version auto-incremented $TRAVIS_JOB_NUMBER"
+    git commit -a -m "Version auto-incremented  - $TRAVIS_JOB_NUMBER"
     gulp build
     gulp release
     git remote add github https://$GITHUB_TOKEN@github.com/bywatersolutions/koha-plugin-kitchen-sink
