@@ -8,6 +8,7 @@ then
   gulp build
   gulp release
   git remote add github https://$GH_TOKEN@github.com/bywatersolutions/koha-plugin-kitchen-sink
+  get fetch --all
   git push github HEAD:master
 else
   echo "No release needing."
