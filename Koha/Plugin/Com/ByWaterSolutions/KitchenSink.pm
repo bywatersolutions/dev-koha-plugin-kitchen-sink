@@ -29,7 +29,7 @@ our $metadata = {
     author          => 'Kyle M Hall',
     date_authored   => '2009-01-27',
     date_updated    => "1900-01-01",
-    minimum_version => '16.06.00.018',
+    minimum_version => '18.05.00.000',
     maximum_version => undef,
     version         => $VERSION,
     description     => 'This plugin implements every available feature '
@@ -167,8 +167,7 @@ sub opac_online_payment_begin {
     );
 
 
-    print $cgi->header();
-    print $template->output();
+    $self->output_html( $template->output() );
 }
 
 ## This method triggers the end of the payment process
@@ -225,8 +224,7 @@ sub opac_online_payment_end {
         message_value => $v,
     );
 
-    print $cgi->header();
-    print $template->output();
+    $self->output_html( $template->output() );
 }
 
 ## If your plugin needs to add some CSS to the OPAC, you'll want
@@ -275,8 +273,7 @@ sub configure {
             bar             => $self->retrieve_data('bar'),
         );
 
-        print $cgi->header();
-        print $template->output();
+        $self->output_html( $template->output() );
     }
     else {
         $self->store_data(
@@ -334,8 +331,7 @@ sub report_step1 {
         categories => \@categories,
     );
 
-    print $cgi->header();
-    print $template->output();
+    $self->output_html( $template->output() );
 }
 
 sub report_step2 {
@@ -416,8 +412,7 @@ sub tool_step1 {
 
     my $template = $self->get_template({ file => 'tool-step1.tt' });
 
-    print $cgi->header();
-    print $template->output();
+    $self->output_html( $template->output() );
 }
 
 sub tool_step2 {
@@ -447,8 +442,7 @@ sub tool_step2 {
     $dbh->do( "INSERT INTO $table ( borrowernumber ) VALUES ( ? )",
         undef, ($borrowernumber) );
 
-    print $cgi->header();
-    print $template->output();
+    $self->output_html( $template->output() );
 }
 
 1;
