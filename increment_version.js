@@ -14,9 +14,9 @@ let patch = parseInt( version_parts[2] );
 
 const prev_version = json.previous_version;
 const prev_version_parts = prev_version.split('.');
-let prev_major = parseInt( version_parts[0] );
-let prev_minor = parseInt( version_parts[1] );
-let prev_patch = parseInt( version_parts[2] );
+let prev_major = parseInt( prev_version_parts[0] );
+let prev_minor = parseInt( prev_version_parts[1] );
+let prev_patch = parseInt( prev_version_parts[2] );
 
 let new_version;
 
