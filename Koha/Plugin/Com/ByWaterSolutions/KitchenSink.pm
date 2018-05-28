@@ -310,7 +310,8 @@ sub install() {
 sub upgrade {
     my ( $self, $args ) = @_;
 
-    $self->store_data( { last_upgraded => dt_from_string()->datetime(' ') } );
+    my $dt = dt_from_string();
+    $self->store_data( { last_upgraded => $dt->ymd('-') . ' ' . $dt->hms(':') } );
 
     return 1;
 }
