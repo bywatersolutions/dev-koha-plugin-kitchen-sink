@@ -1,7 +1,7 @@
 {
   "name": "koha-plugin-kitchen-sink",
-  "version": "2.1.15",
-  "previous_version": "2.1.14",
+  "version": "2.1.16",
+  "previous_version": "2.1.15",
   "description": "Koha Kitchen Sink Plugin",
   "devDependencies": {
     "gulp": "^3.9.1",
