@@ -1,3 +1,4 @@
+[% USE KohaDates %]
 [% INCLUDE 'doc-head-open.inc' %]
  <title>Koha: Kitchen Sink Plugin: Configuration</title>
 [% INCLUDE 'doc-head-close.inc' %]
@@ -62,5 +63,16 @@
 
         <input type="submit" value="Save configuration" />
     </form>
+
+    <hr/>
+
+    <p>
+        <h5>Upgrade status</h5>
+        [% IF last_upgraded %]
+            Plugin was last upgraded on this system on [% last_upgraded | $KohaDates with_hours => 1 %]
+        [% ELSE %]
+            Plugin has never been upgraded.
+        [% END %]
+    </p>
 
 [% INCLUDE 'intranet-bottom.inc' %]

@@ -271,6 +271,7 @@ sub configure {
             enable_opac_payments => $self->retrieve_data('enable_opac_payments'),
             foo             => $self->retrieve_data('foo'),
             bar             => $self->retrieve_data('bar'),
+            last_upgraded   => $self->retrieve_data('last_upgraded'),
         );
 
         $self->output_html( $template->output() );
@@ -302,6 +303,16 @@ sub install() {
             `borrowernumber` INT( 11 ) NOT NULL
         ) ENGINE = INNODB;
     " );
+}
+
+## This is the 'upgrade' method. It will be triggered when a newer version of a
+## plugin is installed over an existing older version of a plugin
+sub upgrade {
+    my ( $self, $args ) = @_;
+
+    $self->store_data( last_upgraded => dt_from_string()->datetime(' ') );
+
+    return 1;
 }
 
 ## This method will be run just before the plugin files are deleted
