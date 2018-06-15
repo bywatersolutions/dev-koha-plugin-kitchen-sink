@@ -8,8 +8,8 @@ use base qw(Koha::Plugins::Base);
 
 ## We will also need to include any Koha libraries we want to access
 use C4::Context;
-use C4::Members;
 use C4::Auth;
+use Koha::Patron;
 use Koha::DateUtils;
 use Koha::Libraries;
 use Koha::Patron::Categories;
@@ -434,10 +434,11 @@ sub tool_step2 {
     my $template = $self->get_template({ file => 'tool-step2.tt' });
 
     my $borrowernumber = C4::Context->userenv->{'number'};
-    my $borrower = GetMember( borrowernumber => $borrowernumber );
+    my $borrower = Koha::Patrons->find( $borrowernumber );
+    $template->param( 'victim' => $borrower->unblessed() );
     $template->param( 'victim' => $borrower );
 
-    ModMember( borrowernumber => $borrowernumber, firstname => 'Bob' );
+    $borrower->firstname('Bob')->store;
 
     my $dbh = C4::Context->dbh;
 
@@ -447,7 +448,8 @@ sub tool_step2 {
     $sth->execute();
     my @victims;
     while ( my $r = $sth->fetchrow_hashref() ) {
-        push( @victims, GetMember( borrowernumber => $r->{'borrowernumber'} ) );
+        my $brw = Koha::Patrons->find( $r->{'borrowernumber'} )->unblessed();
+        push( @victims, ( $brw ) );
     }
     $template->param( 'victims' => \@victims );
 
