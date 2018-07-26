@@ -1,0 +1,50 @@
+{
+  "/patrons/{patron_id}/bother": {
+    "put": {
+      "x-mojo-to": "Com::ByWaterSolutions::KitchenSink::BotherPatronController#bother",
+      "operationId": "BotherPatron",
+      "tags": ["patrons"],
+      "parameters": [{
+        "name": "patron_id",
+        "in": "path",
+        "description": "Internal patron identifier",
+        "required": true,
+        "type": "integer"
+      }],
+      "produces": [
+        "application/json"
+      ],
+      "responses": {
+        "200": {
+          "description": "A bothered patron",
+          "schema": {
+              "type": "object",
+                "properties": {
+                  "pissed": {
+                    "description": "If the patron got pissed",
+                    "type": "boolean"
+                  }
+                }
+          }
+        },
+        "404": {
+          "description": "An error occured",
+          "schema": {
+              "type": "object",
+                "properties": {
+                  "error": {
+                    "description": "An explanation for the error",
+                    "type": "string"
+                  }
+                }
+          }
+        }
+      },
+      "x-koha-authorization": {
+        "permissions": {
+          "borrowers": "1"
+        }
+      }
+    }
+  }
+}
