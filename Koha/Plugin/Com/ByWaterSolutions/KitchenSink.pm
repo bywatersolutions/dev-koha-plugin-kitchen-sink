@@ -1,6 +1,6 @@
 package Koha::Plugin::Com::ByWaterSolutions::KitchenSink;
 
-## It's good practive to use Modern::Perl
+## It's good practice to use Modern::Perl
 use Modern::Perl;
 
 ## Required for all plugins
@@ -17,6 +17,7 @@ use Koha::Account;
 use Koha::Account::Lines;
 use MARC::Record;
 use Cwd qw(abs_path);
+use Mojo::JSON qw(decode_json);;
 use URI::Escape qw(uri_unescape);
 use LWP::UserAgent;
 
@@ -455,6 +456,28 @@ sub tool_step2 {
         undef, ($borrowernumber) );
 
     $self->output_html( $template->output() );
+}
+
+## API methods
+# If your plugin implements API routes, then the 'api_routes' method needs
+# to be implemented, returning valid OpenAPI 2.0 paths serialized as a hashref.
+# It is a good practice to actually write OpenAPI 2.0 path specs in JSON on the
+# plugin and read it here. This allows to use the spec for mainline Koha later,
+# thus making this a good prototyping tool.
+
+sub api_routes {
+    my ( $self, $args ) = @_;
+
+    my $spec_str = $self->mbf_read('openapi.json');
+    my $spec     = decode_json($spec_str);
+
+    return $spec;
+}
+
+sub api_namespace {
+    my ( $self ) = @_;
+    
+    return 'kitchensink';
 }
 
 1;
