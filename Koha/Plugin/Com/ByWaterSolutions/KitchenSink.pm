@@ -256,6 +256,35 @@ sub opac_js {
     |;
 }
 
+
+## If your plugin needs to add some CSS to the staff intranet, you'll want
+## to return that CSS here. Don't forget to wrap your CSS in <style>
+## tags. By not adding them automatically for you, you'll have a chance
+## to include external CSS files as well!
+sub intranet_head {
+    my ( $self ) = @_;
+
+    return q|
+        <style>
+          body {
+            background-color: orange;
+          }
+        </style>
+    |;
+}
+
+## If your plugin needs to add some javascript in the staff intranet, you'll want
+## to return that javascript here. Don't forget to wrap your javascript in
+## <script> tags. By not adding them automatically for you, you'll have a
+## chance to include other javascript files if necessary.
+sub intranet_js {
+    my ( $self ) = @_;
+
+    return q|
+        <script>alert("Thanks for testing the kitchen sink plugin!");</script>
+    |;
+}
+
 ## If your tool is complicated enough to needs it's own setting/configuration
 ## you will want to add a 'configure' method to your plugin like so.
 ## Here I am throwing all the logic into the 'configure' method, but it could
