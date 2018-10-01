@@ -252,7 +252,7 @@ sub opac_js {
     my ( $self ) = @_;
 
     return q|
-        <script>alert("Thanks for testing the kitchen sink plugin!");</script>
+        <script>console.log("Thanks for testing the kitchen sink plugin!");</script>
     |;
 }
 
@@ -281,7 +281,7 @@ sub intranet_js {
     my ( $self ) = @_;
 
     return q|
-        <script>alert("Thanks for testing the kitchen sink plugin!");</script>
+        <script>console.log("Thanks for testing the kitchen sink plugin!");</script>
     |;
 }
 
