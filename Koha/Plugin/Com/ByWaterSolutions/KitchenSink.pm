@@ -285,6 +285,17 @@ sub intranet_js {
     |;
 }
 
+sub intranet_catalog_biblio_enhancements_toolbar_button {
+    my ( $self ) = @_;
+
+    return q|
+        <a class="btn btn-default btn-sm" onclick="alert('Peace and long life');">
+          <i class="fa fa-hand-spock-o" aria-hidden="true"></i>
+          Live long and prosper
+        </a>
+    |;
+}
+
 ## If your tool is complicated enough to needs it's own setting/configuration
 ## you will want to add a 'configure' method to your plugin like so.
 ## Here I am throwing all the logic into the 'configure' method, but it could
