@@ -285,6 +285,9 @@ sub intranet_js {
     |;
 }
 
+## This method allows you to add new html elements to the catalogue toolbar.
+## You'll want to return a string of raw html here, most likely a button or other
+## toolbar element of some form. See bug 20968 for more details.
 sub intranet_catalog_biblio_enhancements_toolbar_button {
     my ( $self ) = @_;
 
