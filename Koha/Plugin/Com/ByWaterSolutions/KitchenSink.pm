@@ -368,7 +368,7 @@ sub uninstall() {
 
     my $table = $self->get_qualified_table_name('mytable');
 
-    return C4::Context->dbh->do("DROP TABLE $table");
+    return C4::Context->dbh->do("DROP TABLE IF NOT EXISTS $table");
 }
 
 ## These are helper functions that are specific to this plugin
