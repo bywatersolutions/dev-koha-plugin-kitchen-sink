@@ -343,7 +343,7 @@ sub install() {
     my $table = $self->get_qualified_table_name('mytable');
 
     return C4::Context->dbh->do( "
-        CREATE TABLE  $table (
+        CREATE TABLE IF NOT EXISTS $table (
             `borrowernumber` INT( 11 ) NOT NULL
         ) ENGINE = INNODB;
     " );
