@@ -525,4 +525,13 @@ sub api_namespace {
     return 'kitchensink';
 }
 
+sub static_routes {
+    my ( $self, $args ) = @_;
+
+    my $spec_str = $self->mbf_read('staticapi.json');
+    my $spec     = decode_json($spec_str);
+
+    return $spec;
+}
+
 1;
