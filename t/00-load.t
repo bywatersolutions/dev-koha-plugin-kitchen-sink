@@ -25,9 +25,13 @@ use File::Find;
 
 =cut
 
-# Loop through the Koha:: modules
-my $lib = File::Spec->rel2abs('.');
+my $lib = '/var/lib/koha/kohadev/plugins'; # Could be changed to $Bin/..
+
 unshift( @INC, $lib );
+unshift( @INC, '/kohadevbox/koha/' );
+unshift( @INC, '/kohadevbox/koha/misc/translator/' );
+unshift( @INC, '/kohadevbox/koha/t/lib/' );
+
 find(
     {
         bydepth  => 1,
