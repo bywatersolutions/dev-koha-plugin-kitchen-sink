@@ -1,0 +1,56 @@
+name: CI
+on: [push]
+jobs:
+  unit_test:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+      
+    - name: Export additional variables needed by koha-testing-docker
+      run: |
+        cd ..
+        pwd
+        ls -alh
+        git clone --depth 1 git://git.koha-community.org/koha.git kohaclone
+        export LOCAL_USER_ID="$(id -u)" # Needed for koha-testing-docker
+        export SYNC_REPO=./kohaclone
+        export KOHA_INTRANET_URL="http://127.0.0.1:8081"
+        export KOHA_MARC_FLAVOUR="marc21"
+        echo ::set-env name=LOCAL_USER_ID::$LOCAL_USER_ID
+        echo ::set-env name=SYNC_REPO::$SYNC_REPO
+        echo ::set-env name=KOHA_INTRANET_URL::$KOHA_INTRANET_URL
+        echo ::set-env name=KOHA_MARC_FLAVOUR::$KOHA_MARC_FLAVOUR
+        echo ::set-env name=RUN_TESTS_AND_EXIT::no
+        echo ::set-env name=KOHA_IMAGE::master
+    - name: Set up koha-testing-docker
+      run: |
+        sudo sysctl -w vm.max_map_count=262144
+        wget -O docker-compose.yml https://gitlab.com/koha-community/koha-testing-docker/raw/master/docker-compose.yml
+        mkdir -p env
+        wget -O env/defaults.env https://gitlab.com/koha-community/koha-testing-docker/raw/master/env/defaults.env
+        cp env/defaults.env .env
+        docker-compose pull
+#    - name: Setup Debug Session
+#      uses: csexton/debugger-action@master
+
+    - name: Run tests
+      run: |
+        docker-compose -f docker-compose.yml -p koha up --abort-on-container-exit --no-color
+        echo "SLEEPING 3 MINUTES"
+        sleep 60
+        echo "1 MINUTE DONE"
+        sleep 60
+        echo "2 MINUTES DONE"
+        sleep 60
+        echo "3 MINUTES DONE"
+        echo "WAKING UP"
+        
+    - name: Post test cleanup
+      run: |
+        docker-compose down
+        docker rm -f $(docker ps -a -f "name=koha_" -q)
+        docker volume prune -f
+        docker image  prune -f
+        rm docker-compose.yml
+        rm -rf env .env
