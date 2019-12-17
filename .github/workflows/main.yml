@@ -39,7 +39,7 @@ jobs:
 
     - name: Run tests
       run: |
-        docker-compose -f docker-compose.yml -p koha up --abort-on-container-exit --detach
+        docker-compose -f docker-compose.yml -p koha up --detach
         echo "SLEEPING 3 MINUTES"
         sleep 60
         echo "1 MINUTE DONE"
