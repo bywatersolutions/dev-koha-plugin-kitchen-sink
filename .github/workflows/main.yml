@@ -10,6 +10,8 @@ jobs:
     - name: Export additional variables needed by koha-testing-docker
       run: |
         cd ..
+        pwd
+        ls -alh
         git clone --depth 1 git://git.koha-community.org/koha.git kohaclone
         export ROOT_DIR="$(pwd)"
         export LOCAL_USER_ID="$(id -u)" # Needed for koha-testing-docker
@@ -39,7 +41,12 @@ jobs:
 
     - name: Run tests
       run: |
+        pwd
+        ls -alh
         docker-compose -f docker-compose.yml -p koha up --detach
+        cd ..
+        pwd
+        ls -alh
         echo "SLEEPING 3 MINUTES"
         sleep 60
         echo "1 MINUTE DONE"
