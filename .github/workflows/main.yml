@@ -1,7 +1,7 @@
 name: CI
 on: [push]
 jobs:
-  unit_test:
+  unit_tests:
     name: Run unit tests
     runs-on: ubuntu-latest
     strategy:
@@ -96,3 +96,32 @@ jobs:
         docker image  prune -f
         rm docker-compose.yml
         rm -rf env .env
+
+  release:
+    name: Create release
+    runs-on: ubuntu-latest
+    needs: unit_tests
+    strategy:
+      fail-fast: false
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Get Previous release
+      run: |
+        LAST_RELEASE=$(curl https://api.github.com/repos/bywatersolutions/koha-plugin-kitchen-sink/releases/latest | jq -r '.name')
+        echo "LAST RELEASE: $LAST_RELEASE"
+
+    - name: Get Previous tag
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@master"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Get next minor version
+        id: semvers
+        uses: "WyriHaximus/github-action-next-semvers@master"
+        with:
+          version: ${{ steps.previoustag.outputs.tag }}
+
+      - name: Print next patch version
+        run: echo "NEXT VERSION: ${{ steps.semvers.outputs.patch }}"
