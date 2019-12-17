@@ -6,18 +6,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+
+    - name: Check out Koha
+      run: |
+        cd ..
+        pwd
+        ls -alh
+        git clone --depth 1 git://git.koha-community.org/koha.git kohaclone
       
     - name: Export additional variables needed by koha-testing-docker
       run: |
         cd ..
         pwd
         ls -alh
-        git clone --depth 1 git://git.koha-community.org/koha.git kohaclone
+        IFS='/' read -r -a parts <<< "$GITHUB_REPOSITORY"
+        export GITHUB_REPO="${parts[1]}"
         export ROOT_DIR="$(pwd)"
         export LOCAL_USER_ID="$(id -u)" # Needed for koha-testing-docker
         export SYNC_REPO="$ROOT_DIR/kohaclone"
         export KOHA_INTRANET_URL="http://127.0.0.1:8081"
         export KOHA_MARC_FLAVOUR="marc21"
+        echo ::set-env name=GITHUB_REPO::$GITHUB_REPO
         echo ::set-env name=ROOT_DIR::$ROOT_DIR
         echo ::set-env name=LOCAL_USER_ID::$LOCAL_USER_ID
         echo ::set-env name=SYNC_REPO::$SYNC_REPO
@@ -25,6 +34,7 @@ jobs:
         echo ::set-env name=KOHA_MARC_FLAVOUR::$KOHA_MARC_FLAVOUR
         echo ::set-env name=RUN_TESTS_AND_EXIT::no
         echo ::set-env name=KOHA_IMAGE::master
+        echo "GITHUB REPO: $GITHUB_REPO"
         echo "ROOT DIR: $ROOT_DIR"
         echo "SYNC_REPO: $SYNC_REPO"
         ls -alh $SYNC_REPO
