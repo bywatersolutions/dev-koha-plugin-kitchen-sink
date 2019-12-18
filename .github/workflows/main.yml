@@ -110,8 +110,7 @@ jobs:
       id: myvars
       run: |
         IFS='/' read -r -a parts <<< "$GITHUB_REPOSITORY"
-        export GITHUB_REPO="${parts[1]}"
-        echo ::set-env name=GITHUB_REPO::$GITHUB_REPO
+        GITHUB_REPO="${parts[1]}"
         echo ::set-output name=github_repo::$GITHUB_REPO
         echo "GITHUB REPO: $GITHUB_REPO"
 
