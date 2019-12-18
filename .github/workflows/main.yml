@@ -106,8 +106,14 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-    - name: Run build step of gulpfile
-      uses: elstudio/actions-js-build/build@v2
+    - name: Parse out and store the GitHub repository name
+      id: myvars
+      run: |
+        IFS='/' read -r -a parts <<< "$GITHUB_REPOSITORY"
+        export GITHUB_REPO="${parts[1]}"
+        echo ::set-env name=GITHUB_REPO::$GITHUB_REPO
+        echo ::set-output name=github_repo::$GITHUB_REPO
+        echo "GITHUB REPO: $GITHUB_REPO"
 
     - name: Get Previous tag
       id: previoustag
@@ -121,24 +127,14 @@ jobs:
       with:
         version: ${{ steps.previoustag.outputs.tag }}
 
-    - name: Create release kpz artifact
+    - name: Build Koha Plugin kpz artifact
+      id: kpz
+      uses: "bywatersolutions/github-action-koha-plugin-create-kpz@master"
+      with:
+        release-version: ${{ steps.semvers.outputs.v_patch }}
+        release-name: ${{ steps.myvars.outputs.GITHUB_REPO }}
+
+    - name: See if kpz was created
       run: |
-        PLUGIN_PERL_MODULE=$(find . -regex '\./Koha/Plugin/Com/ByWaterSolutions/[A-Za-z]*\.pm$')
-        echo "PLUGIN PERL MODULE: $PLUGIN_PERL_MODULE"
-        echo "NEXT VERSION: ${{ steps.semvers.outputs.v_patch }}"
-        sed -i -e "s/{VERSION}/${{ steps.semvers.outputs.v_patch }}/g" $PLUGIN_PERL_MODULE
-
-        TODAY_ISO=$(date '+%Y-%m-%d')
-        sed -i -e "s/1900-01-01/${TODAY_ISO}/g" $PLUGIN_PERL_MODULE
-
-        git diff
-
-        PACKAGE_NAME=$(jq -r '.name' package.json)
-        RELEASE_FILENAME="$PACKAGE_NAME-${{ steps.semvers.outputs.v_patch }}.kpz"
-        mkdir dist
-        cp -r Koha dist/.
-        cd dist
-        zip -r ../${RELEASE_FILENAME} ./Koha
-        cd ..
-        rm -rf dist
+        echo "FILENAME: ${{ steps.kpz.outputs.filename }}"
         ls -alh
