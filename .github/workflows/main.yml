@@ -106,6 +106,9 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
+    - name: Run build step of gulpfile
+      uses: elstudio/actions-js-build/build@v2
+
     - name: Get Previous tag
       id: previoustag
       uses: "WyriHaximus/github-action-get-previous-tag@master"
@@ -118,7 +121,7 @@ jobs:
       with:
         version: ${{ steps.previoustag.outputs.tag }}
 
-    - name: Create release artifact
+    - name: Create release kpz artifact
       run: |
         PLUGIN_PERL_MODULE=$(find . -regex '\./Koha/Plugin/Com/ByWaterSolutions/[A-Za-z]*\.pm$')
         echo "PLUGIN PERL MODULE: $PLUGIN_PERL_MODULE"
