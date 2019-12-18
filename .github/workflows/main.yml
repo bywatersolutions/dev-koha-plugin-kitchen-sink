@@ -31,7 +31,6 @@ jobs:
             KOHA_VERSION_BRANCH_NAME=${KOHA_VERSION_LINE_PARTS[2]}
         fi
         echo "KOHA VERSION BRANCH NAME: $KOHA_VERSION_BRANCH_NAME"
-
         git clone --branch $KOHA_VERSION_BRANCH_NAME --single-branch --depth 1 git://git.koha-community.org/koha.git kohaclone
       
     - name: Export additional variables needed by koha-testing-docker
@@ -58,6 +57,7 @@ jobs:
         echo "ROOT DIR: $ROOT_DIR"
         echo "SYNC_REPO: $SYNC_REPO"
         ls -alh $SYNC_REPO
+
     - name: Set up koha-testing-docker
       run: |
         sudo sysctl -w vm.max_map_count=262144
@@ -106,11 +106,6 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-    - name: Get Previous release
-      run: |
-        LAST_RELEASE=$(curl https://api.github.com/repos/bywatersolutions/koha-plugin-kitchen-sink/releases/latest | jq -r '.name')
-        echo "LAST RELEASE: $LAST_RELEASE"
-
     - name: Get Previous tag
       id: previoustag
       uses: "WyriHaximus/github-action-get-previous-tag@master"
@@ -123,6 +118,24 @@ jobs:
       with:
         version: ${{ steps.previoustag.outputs.tag }}
 
-    - name: Print next patch version
+    - name: Create release artifact
       run: |
+        PLUGIN_PERL_MODULE=$(find . -regex '\./Koha/Plugin/Com/ByWaterSolutions/[A-Za-z]*\.pm$')
+        echo "PLUGIN PERL MODULE: $PLUGIN_PERL_MODULE"
         echo "NEXT VERSION: ${{ steps.semvers.outputs.v_patch }}"
+        sed -i -e "s/{VERSION}/${{ steps.semvers.outputs.v_patch }}/g" $PLUGIN_PERL_MODULE
+
+        TODAY_ISO=$(date '+%Y-%m-%d')
+        sed -i -e "s/1900-01-01/${TODAY_ISO}/g" $PLUGIN_PERL_MODULE
+
+        git diff
+
+        PACKAGE_NAME=$(jq -r '.name' package.json)
+        RELEASE_FILENAME="$PACKAGE_NAME-${{ steps.semvers.outputs.v_patch }}.kpz"
+        mkdir dist
+        cp -r Koha dist/.
+        cd dist
+        zip -r ../${RELEASE_FILENAME} ./Koha
+        cd ..
+        rm -rf dist
+        ls -alh
