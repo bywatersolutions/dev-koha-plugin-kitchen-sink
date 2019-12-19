@@ -11,6 +11,12 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
+    - name: Get Koha Version Branch Name
+      id: koha-version
+      uses: "bywatersolutions/github-action-koha-get-version-by-label@master"
+      with:
+        version-label: "${{ matrix.koha-version }}"
+
     - name: Check out Koha
       run: |
         cd ..
