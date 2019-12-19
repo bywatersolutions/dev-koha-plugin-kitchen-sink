@@ -20,24 +20,7 @@ jobs:
     - name: Check out Koha
       run: |
         cd ..
-        pwd
-        ls -alh
-        echo "MATRIX KOHA VERSION: ${{ matrix.koha-version }}"
-        if [[ "${{ matrix.koha-version }}" == "master" ]]; then
-            KOHA_VERSION_BRANCH_NAME='master'
-        elif [[ "${{ matrix.koha-version }}" == "stable" ]]; then
-            KOHA_VERSION_LINE=$(git ls-remote --heads git://git.koha-community.org/koha.git | grep '[0-9]\{2\}\.[0-9]\{2\}\.x' | tac | sed '1q;d')
-            echo "KOHA VERSION LINE: $KOHA_VERSION_LINE"
-            IFS='/' read -ra KOHA_VERSION_LINE_PARTS <<< "$KOHA_VERSION_LINE"
-            KOHA_VERSION_BRANCH_NAME=${KOHA_VERSION_LINE_PARTS[2]}
-        elif [[ "${{ matrix.koha-version }}" == "oldstable" ]]; then
-            KOHA_VERSION_LINE=$(git ls-remote --heads git://git.koha-community.org/koha.git | grep '[0-9]\{2\}\.[0-9]\{2\}\.x' | tac | sed '2q;d')
-            echo "KOHA VERSION LINE: $KOHA_VERSION_LINE"
-            IFS='/' read -ra KOHA_VERSION_LINE_PARTS <<< "$KOHA_VERSION_LINE"
-            KOHA_VERSION_BRANCH_NAME=${KOHA_VERSION_LINE_PARTS[2]}
-        fi
-        echo "KOHA VERSION BRANCH NAME: $KOHA_VERSION_BRANCH_NAME"
-        git clone --branch $KOHA_VERSION_BRANCH_NAME --single-branch --depth 1 git://git.koha-community.org/koha.git kohaclone
+        git clone --branch ${{ steps.koha-version.outputs.current-branch-name }} --single-branch --depth 1 git://git.koha-community.org/koha.git kohaclone
       
     - name: Export additional variables needed by koha-testing-docker
       run: |
