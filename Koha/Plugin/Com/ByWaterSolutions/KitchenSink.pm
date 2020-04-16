@@ -23,6 +23,7 @@ use LWP::UserAgent;
 
 ## Here we set our plugin version
 our $VERSION = "{VERSION}";
+our $MINIMUM_VERSION = "{MINIMUM_VERSION}";
 
 ## Here is our metadata, some keys are required, some are optional
 our $metadata = {
@@ -30,7 +31,7 @@ our $metadata = {
     author          => 'Kyle M Hall',
     date_authored   => '2009-01-27',
     date_updated    => "1900-01-01",
-    minimum_version => '18.05.00.000',
+    minimum_version => $MINIMUM_VERSION,
     maximum_version => undef,
     version         => $VERSION,
     description     => 'This plugin implements every available feature '

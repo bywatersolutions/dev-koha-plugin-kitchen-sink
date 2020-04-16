@@ -2,7 +2,7 @@ name: Example Kitchen-Sink Plugin
 author: Kyle M Hall
 date_authored: 2009-01-27
 date_updated: 1900-01-01
-minimum_version: 19.05.00.000
-maximum_version: 19.05.99.999
-version: $VERSION
+minimum_version: {MINIMUM_VERSION}
+maximum_version:
+version: {VERSION}
 description: This plugin implements every available feature of the plugin system and is meant to be documentation and a starting point for writing your own plugins!
