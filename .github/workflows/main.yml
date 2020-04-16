@@ -170,3 +170,25 @@ jobs:
         asset_path: ./META.yml
         asset_name: META.yml
         asset_content_type: text/yaml
+
+    - name: Upload Release Asset README.md
+      id: upload-release-asset-readme
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./README.md
+        asset_name: README.md
+        asset_content_type: text/markdown
+
+    - name: Upload Release Asset CHANGELOG.md
+      id: upload-release-asset-changelog
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./CHANGELOG.md
+        asset_name: CHANGELOG.md
+        asset_content_type: text/markdown
