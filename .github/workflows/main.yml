@@ -119,10 +119,14 @@ jobs:
         version: ${{ steps.previoustag.outputs.tag }}
 
     - name: Get Koha Version Branch Name
-      id: koha-version
+      id: koha-version-oldstable
       uses: "bywatersolutions/github-action-koha-get-version-by-label@master"
       with:
         version-label: "oldstable"
+
+    - name: Print minimum version
+      run: |
+        echo "Current oldstable version: ${{ steps.koha-version-oldstable.outputs.version-major-minor }}"
 
     - name: Build Koha Plugin kpz artifact
       id: kpz
@@ -130,7 +134,7 @@ jobs:
       with:
         release-version: ${{ steps.semvers.outputs.v_patch }}
         release-name: ${{ steps.myvars.outputs.GITHUB_REPO }}
-        minimum-version: ${{ steps.koha-version.outputs.version-major-minor }}
+        minimum-version: ${{ steps.koha-version-oldstable.outputs.version-major-minor }}
 
     - name: See if kpz was created
       run: |
