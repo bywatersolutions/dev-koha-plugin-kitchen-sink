@@ -102,6 +102,9 @@ jobs:
         GITHUB_REPO="${parts[1]}"
         echo ::set-output name=github_repo::$GITHUB_REPO
         echo "GITHUB REPO: $GITHUB_REPO"
+        META_YML=$(find . -regex '\./Koha/Plugin/.*[A-Za-z]*/META\.yml$' | sed '1q;d')
+        echo ::set-output name=meta_yml::$META_YML
+        echo "META.yml: $META_YML"
 
     - name: Get Previous tag
       id: previoustag
@@ -138,8 +141,8 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: Upload Release Asset
-      id: upload-release-asset 
+    - name: Upload Release Asset kpz
+      id: upload-release-asset-kpz
       uses: actions/upload-release-asset@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -148,3 +151,14 @@ jobs:
         asset_path: ./${{ steps.kpz.outputs.filename }}
         asset_name: ${{ steps.kpz.outputs.filename }}
         asset_content_type: application/kpz
+
+    - name: Upload Release Asset META.yml
+      id: upload-release-asset-meta
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./${{ steps.myvars.outputs.META_YML }}
+        asset_name: META.yml
+        asset_content_type: text/yaml
