@@ -160,15 +160,15 @@ jobs:
         asset_name: ${{ steps.kpz.outputs.filename }}
         asset_content_type: application/kpz
 
-    - name: Upload Release Asset META.yml
+    - name: Upload Release Asset PLUGIN.yml
       id: upload-release-asset-meta
       uses: actions/upload-release-asset@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./META.yml
-        asset_name: META.yml
+        asset_path: ./PLUGIN.yml
+        asset_name: PLUGIN.yml
         asset_content_type: text/yaml
 
     - name: Upload Release Asset README.md
