@@ -6,3 +6,4 @@ minimum_version: {MINIMUM_VERSION}
 maximum_version:
 version: {VERSION}
 description: This plugin implements every available feature of the plugin system and is meant to be documentation and a starting point for writing your own plugins!
+module: Koha::Plugin::Com::ByWaterSolutions::KitchenSink
