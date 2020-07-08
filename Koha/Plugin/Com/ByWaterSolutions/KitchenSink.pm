@@ -535,4 +535,29 @@ sub static_routes {
     return $spec;
 }
 
+=head3 opac_detail_xslt_variables
+
+Plugin hook injecting variables to the OPAC detail XSLT
+
+=cut
+
+sub opac_detail_xslt_variables {
+    my ( $self, $params ) = @_;
+
+    return { nice_message => 'We love Koha /' };
+}
+
+=head3 opac_results_xslt_variables
+
+Plugin hook injecting variables to the OPAC results XSLT
+
+=cut
+
+sub opac_results_xslt_variables {
+    my ( $self, $params ) = @_;
+
+    return { nice_message => 'We love Koha /' };
+}
+
+
 1;
