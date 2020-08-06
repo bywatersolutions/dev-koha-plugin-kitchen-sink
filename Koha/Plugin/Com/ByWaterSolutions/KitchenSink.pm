@@ -24,7 +24,7 @@ use LWP::UserAgent;
 ## TestModule.pm is located in the 'lib' directory inside our assets directory.
 ## We can include any extra modules we need there, such as Koha::Object(s) and
 ## DBIC Schema files
-require TestModule;
+use TestModule;
 
 ## Here we set our plugin version
 our $VERSION = "{VERSION}";
