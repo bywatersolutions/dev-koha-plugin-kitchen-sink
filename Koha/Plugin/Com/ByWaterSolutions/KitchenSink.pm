@@ -21,11 +21,6 @@ use Mojo::JSON qw(decode_json);;
 use URI::Escape qw(uri_unescape);
 use LWP::UserAgent;
 
-## TestModule.pm is located in the 'lib' directory inside our assets directory.
-## We can include any extra modules we need there, such as Koha::Object(s) and
-## DBIC Schema files
-use TestModule;
-
 ## Here we set our plugin version
 our $VERSION = "{VERSION}";
 our $MINIMUM_VERSION = "{MINIMUM_VERSION}";
