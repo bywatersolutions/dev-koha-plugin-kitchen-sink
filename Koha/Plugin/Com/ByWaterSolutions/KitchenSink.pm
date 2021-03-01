@@ -559,5 +559,17 @@ sub opac_results_xslt_variables {
     return { nice_message => 'We love Koha /' };
 }
 
+=head3 cronjob_nightly
+
+Plugin hook running code from a cron job
+
+=cut
+
+sub cronjob_nightly {
+    my ( $self ) = @_;
+
+    print "Remember to clean the kitchen\n";
+}
+
 
 1;
