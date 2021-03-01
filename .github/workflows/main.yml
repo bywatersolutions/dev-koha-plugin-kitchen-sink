@@ -20,7 +20,7 @@ jobs:
     - name: Check out Koha
       run: |
         cd ..
-        git clone --branch ${{ steps.koha-version.outputs.current-branch-name }} --single-branch --depth 1 git://git.koha-community.org/koha.git kohaclone
+        git clone --branch ${{ steps.koha-version.outputs.current-branch-name }} --single-branch --depth 1 https://git.koha-community.org/Koha-community/Koha.git kohaclone
       
     - name: Export additional variables needed by koha-testing-docker
       run: |
