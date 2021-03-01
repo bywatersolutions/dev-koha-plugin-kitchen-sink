@@ -34,14 +34,14 @@ jobs:
         export SYNC_REPO="$ROOT_DIR/kohaclone"
         export KOHA_INTRANET_URL="http://127.0.0.1:8081"
         export KOHA_MARC_FLAVOUR="marc21"
-        echo ::set-env name=GITHUB_REPO::$GITHUB_REPO
-        echo ::set-env name=ROOT_DIR::$ROOT_DIR
-        echo ::set-env name=LOCAL_USER_ID::$LOCAL_USER_ID
-        echo ::set-env name=SYNC_REPO::$SYNC_REPO
-        echo ::set-env name=KOHA_INTRANET_URL::$KOHA_INTRANET_URL
-        echo ::set-env name=KOHA_MARC_FLAVOUR::$KOHA_MARC_FLAVOUR
-        echo ::set-env name=RUN_TESTS_AND_EXIT::no
-        echo ::set-env name=KOHA_IMAGE::master
+        echo "GITHUB_REPO=$GITHUB_REPO" >> $GITHUB_ENV
+        echo "ROOT_DIR=$ROOT_DIR" >> $GITHUB_ENV
+        echo "LOCAL_USER_ID=$LOCAL_USER_ID" >> $GITHUB_ENV
+        echo "SYNC_REPO=$SYNC_REPO" >> $GITHUB_ENV
+        echo "KOHA_INTRANET_URL=$KOHA_INTRANET_URL" >> $GITHUB_ENV
+        echo "KOHA_MARC_FLAVOUR=$KOHA_MARC_FLAVOUR" >> $GITHUB_ENV
+        echo "RUN_TESTS_AND_EXIT=no" >> $GITHUB_ENV
+        echo "KOHA_IMAGE=master" >> $GITHUB_ENV
         echo "GITHUB REPO: $GITHUB_REPO"
         echo "ROOT DIR: $ROOT_DIR"
         echo "SYNC_REPO: $SYNC_REPO"
