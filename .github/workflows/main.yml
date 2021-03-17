@@ -132,7 +132,7 @@ jobs:
       id: kpz
       uses: "bywatersolutions/github-action-koha-plugin-create-kpz@master"
       with:
-        release-version: ${{ steps.semvers.outputs.v_patch }}
+        release-version: ${{ steps.semvers.outputs.patch }}
         release-name: ${{ steps.myvars.outputs.GITHUB_REPO }}
         minimum-version: ${{ steps.koha-version-oldstable.outputs.version-major-minor }}
 
