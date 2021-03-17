@@ -1,5 +1,7 @@
 name: CI
 on: [push]
+schedule:
+    - cron: '0 6 * * *'
 jobs:
   unit_tests:
     name: Run unit tests
@@ -89,6 +91,7 @@ jobs:
   release:
     name: Build & Release
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'schedule' }}
     needs: unit_tests
     strategy:
       fail-fast: false
