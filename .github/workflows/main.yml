@@ -1,7 +1,10 @@
 name: CI
-on: [push]
-schedule:
-    - cron: '0 6 * * *'
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: "0 6 * * *"
 jobs:
   unit_tests:
     name: Run unit tests
