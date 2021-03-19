@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - master
+    tags:
+      - 'v*.*.*'
   schedule:
     - cron: "0 6 * * *"
 jobs:
@@ -13,7 +15,33 @@ jobs:
       fail-fast: false
       matrix:
         koha-version: [master, stable, oldstable]
+
     steps:
+
+    - name: Is a tag?
+      run: |
+        echo "${{ startsWith(github.ref, 'refs/tags/v') }}"
+
+    - name: GitHub Ref 1
+      run: |
+        echo "${GITHUB_REF##*/}"
+
+    - name: GitHub Ref 2
+      run: |
+        echo "${{ github.event.ref }}"
+
+    - name: GitHub Ref 3
+      run: |
+        echo "${{ github.ref }}"
+
+    - name: Dump env
+      run: env | sort
+
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+
     - uses: actions/checkout@v1
 
     - name: Get Koha Version Branch Name
@@ -94,7 +122,7 @@ jobs:
   release:
     name: Build & Release
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'schedule' }}
+    if: startsWith(github.ref, 'refs/tags/v')
     needs: unit_tests
     strategy:
       fail-fast: false
@@ -109,17 +137,11 @@ jobs:
         echo ::set-output name=github_repo::$GITHUB_REPO
         echo "GITHUB REPO: $GITHUB_REPO"
 
-    - name: Get Previous tag
-      id: previoustag
-      uses: "WyriHaximus/github-action-get-previous-tag@master"
-      env:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-
-    - name: Get next minor version
-      id: semvers
-      uses: "WyriHaximus/github-action-next-semvers@master"
-      with:
-        version: ${{ steps.previoustag.outputs.tag }}
+        TAG_VERSION="${GITHUB_REF##*/}"
+        echo "TAG VERSION: $TAG_VERSION"
+        TAG_VERSION="${TAG_VERSION:1}"
+        echo "TAG VERSION 2: $TAG_VERSION"
+        echo ::set-output name=tag_version::$TAG_VERSION
 
     - name: Get Koha Version Branch Name
       id: koha-version-oldstable
@@ -131,12 +153,17 @@ jobs:
       run: |
         echo "Current oldstable version: ${{ steps.koha-version-oldstable.outputs.version-major-minor }}"
 
+    - name: Dump myvars outputs
+      env:
+        GITHUB_CONTEXT: ${{ toJson(steps.myvars.outputs) }}
+      run: echo "$GITHUB_CONTEXT"
+
     - name: Build Koha Plugin kpz artifact
       id: kpz
       uses: "bywatersolutions/github-action-koha-plugin-create-kpz@master"
       with:
-        release-version: ${{ steps.semvers.outputs.patch }}
-        release-name: ${{ steps.myvars.outputs.GITHUB_REPO }}
+        release-version: ${{ steps.myvars.outputs.tag_version }}
+        release-name: ${{ steps.myvars.outputs.github_repo }}
         minimum-version: ${{ steps.koha-version-oldstable.outputs.version-major-minor }}
 
     - name: See if kpz was created
@@ -144,57 +171,12 @@ jobs:
         echo "FILENAME: ${{ steps.kpz.outputs.filename }}"
         ls -alh
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
       with:
-        tag_name: ${{ steps.semvers.outputs.v_patch }}
-        release_name: Release ${{ steps.semvers.outputs.v_patch }}
-        draft: false
-        prerelease: false
-
-    - name: Upload Release Asset kpz
-      id: upload-release-asset-kpz
-      uses: actions/upload-release-asset@v1.0.1
+        files: |
+          ${{ steps.kpz.outputs.filename }}
+          CHANGELOG.md
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./${{ steps.kpz.outputs.filename }}
-        asset_name: ${{ steps.kpz.outputs.filename }}
-        asset_content_type: application/kpz
-
-    - name: Upload Release Asset PLUGIN.yml
-      id: upload-release-asset-meta
-      uses: actions/upload-release-asset@v1.0.1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./PLUGIN.yml
-        asset_name: PLUGIN.yml
-        asset_content_type: text/yaml
-
-    - name: Upload Release Asset README.md
-      id: upload-release-asset-readme
-      uses: actions/upload-release-asset@v1.0.1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./README.md
-        asset_name: README.md
-        asset_content_type: text/markdown
-
-    - name: Upload Release Asset CHANGELOG.md
-      id: upload-release-asset-changelog
-      uses: actions/upload-release-asset@v1.0.1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./CHANGELOG.md
-        asset_name: CHANGELOG.md
-        asset_content_type: text/markdown
