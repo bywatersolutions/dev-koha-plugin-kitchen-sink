@@ -7,19 +7,22 @@ use Modern::Perl;
 use base qw(Koha::Plugins::Base);
 
 ## We will also need to include any Koha libraries we want to access
-use C4::Context;
 use C4::Auth;
-use Koha::Patron;
+use C4::Context;
+
+use Koha::Account::Lines;
+use Koha::Account;
 use Koha::DateUtils;
 use Koha::Libraries;
 use Koha::Patron::Categories;
-use Koha::Account;
-use Koha::Account::Lines;
-use MARC::Record;
+use Koha::Patron;
+
 use Cwd qw(abs_path);
+use Data::Dumper;
+use LWP::UserAgent;
+use MARC::Record;
 use Mojo::JSON qw(decode_json);;
 use URI::Escape qw(uri_unescape);
-use LWP::UserAgent;
 
 ## Here we set our plugin version
 our $VERSION = "{VERSION}";
@@ -569,6 +572,19 @@ sub cronjob_nightly {
     my ( $self ) = @_;
 
     print "Remember to clean the kitchen\n";
+}
+
+=head3 before_send_messages
+
+Plugin hook that runs right before the message queue is processed
+in process_message_queue.pl
+
+=cut
+
+sub before_send_messages {
+    my ( $self, $params ) = @_;
+
+    print "Plugin hook before_send_message called with the params: " . Data::Dumper::Dumper( $params );
 }
 
 
