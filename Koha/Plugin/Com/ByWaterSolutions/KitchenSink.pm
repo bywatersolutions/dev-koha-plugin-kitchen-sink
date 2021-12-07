@@ -587,5 +587,32 @@ sub before_send_messages {
     print "Plugin hook before_send_message called with the params: " . Data::Dumper::Dumper( $params );
 }
 
+=head3 item_barcode_transform
+
+Plugin hook that transforms input string anywhere that item barcodes are scanned in
+
+=cut
+
+sub item_barcode_transform {
+    my ( $self, $barcode_ref ) = @_;
+
+    # Second arg is a ref to barcode value, for recursive call
+    # this ref needs to be altered, no need to return new value
+    $$barcode_ref = "I".$$barcode_ref;
+}
+
+=head3 patron_barcode_transform
+
+Plugin hook that transforms input string anywhere that patron barcodes are scanned in
+
+=cut
+
+sub patron_barcode_transform {
+    my ( $self, $barcode_ref ) = @_;
+
+    # Second arg is a ref to barcode value, for recursive call
+    # this ref needs to be altered, no need to return new value
+    $$barcode_ref = "P".$$barcode_ref;
+}
 
 1;
