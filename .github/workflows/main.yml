@@ -100,7 +100,7 @@ jobs:
         pwd
         ls -alh
         echo "`date`: Installing YAML::Syck, needed for Koha 20.11 and earlier"
-        docker exec koha_koha_1 apt-get install -y libyaml-syck-perl libemail-valid-perl
+        docker exec koha_koha_1 apt-get install -y libyaml-syck-perl libemail-valid-perl libmojo-jwt-perl
         while [ $? -ne 0 ]; do echo "INSTALL YAML::Syck" && docker exec koha_koha_1 apt-get install -y libyaml-syck-perl libemail-valid-perl; done
         echo "SLEEPING 3 MINUTES"
         sleep 60
