@@ -615,4 +615,34 @@ sub patron_barcode_transform {
     $$barcode_ref = "P".$$barcode_ref;
 }
 
+=head3 intranet_catalog_biblio_tab
+
+Plugin hook that adds new tabs to the staff record details page
+with whatever content you create.
+
+https://bugs.koha-community.org/bugzilla3/show_bug.cgi?id=23050
+
+=cut
+
+sub intranet_catalog_biblio_tab {
+    my @tabs;
+    push @tabs,
+      Koha::Plugins::Tab->new(
+        {
+            title   => 'Tab 1',
+            content => 'This is content for tab 1'
+        }
+      );
+
+    push @tabs,
+      Koha::Plugins::Tab->new(
+        {
+            title   => 'Tab 2',
+            content => 'This is content for tab 2'
+        }
+      );
+
+    return @tabs;
+}
+
 1;
