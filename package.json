@@ -26,5 +26,8 @@
     "datetime": "0.0.3",
     "jsonfile": "^4.0.0",
     "node-datetime": "^2.0.0"
+  },
+  "overrides": {
+    "graceful-fs": "^4.2.9"
   }
 }
