@@ -188,7 +188,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  release:
+  keepalive:
     name: Keep Alive
     runs-on: ubuntu-latest
     steps:
