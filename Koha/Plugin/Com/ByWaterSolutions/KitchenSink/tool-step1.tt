@@ -21,4 +21,16 @@
         <input name="submitted" type="submit" value="Click me" />
     </form>
 
+    <br/>
+
+    <form method="post">
+        <input type="hidden" name="class" value="[% CLASS %]"/>
+        <input type="hidden" name="method" value="[% METHOD %]"/>
+
+        <br/>
+        <input type="number" name="count" value="6" />
+
+        <input name="greet" type="submit" value="Schedule greetings" />
+    </form>
+
 [% INCLUDE 'intranet-bottom.inc' %]

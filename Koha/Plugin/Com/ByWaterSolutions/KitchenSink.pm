@@ -24,6 +24,8 @@ use MARC::Record;
 use Mojo::JSON qw(decode_json);;
 use URI::Escape qw(uri_unescape);
 
+use Koha::Plugin::Com::ByWaterSolutions::KitchenSink::Greeter;
+
 ## Here we set our plugin version
 our $VERSION = "{VERSION}";
 our $MINIMUM_VERSION = "{MINIMUM_VERSION}";
@@ -40,6 +42,7 @@ our $metadata = {
     description     => 'This plugin implements every available feature '
       . 'of the plugin system and is meant '
       . 'to be documentation and a starting point for writing your own plugins!',
+    namespace       => 'kitchensink',
 };
 
 ## This is the minimum code required for a plugin's 'new' method
@@ -85,13 +88,15 @@ sub tool {
 
     my $cgi = $self->{'cgi'};
 
-    unless ( $cgi->param('submitted') ) {
-        $self->tool_step1();
-    }
-    else {
+    if ( $cgi->param('submitted') ) {
         $self->tool_step2();
     }
-
+    elsif ( $cgi->param('greet') ) {
+        $self->schedule_greets();
+    }
+    else {
+        $self->tool_step1();
+    }
 }
 
 ## The existiance of a 'to_marc' subroutine means the plugin is capable
@@ -507,6 +512,20 @@ sub tool_step2 {
     $self->output_html( $template->output() );
 }
 
+sub schedule_greets {
+    my ($self) = @_;
+
+    my $cgi   = $self->{cgi};
+    my $count = $cgi->param('count');
+
+    Koha::Plugin::Com::ByWaterSolutions::KitchenSink::Greeter->new->enqueue( { size => $count } );
+
+    my $template = $self->get_template( { file => 'greets_scheduled.tt' } );
+    $template->param( count => $count );
+
+    $self->output_html( $template->output() );
+}
+
 ## API methods
 # If your plugin implements API routes, then the 'api_routes' method needs
 # to be implemented, returning valid OpenAPI 2.0 paths serialized as a hashref.
@@ -643,6 +662,18 @@ sub intranet_catalog_biblio_tab {
       );
 
     return @tabs;
+}
+
+=head3 background_tasks
+
+Plugin hook used to register new background_job types
+
+=cut
+
+sub background_tasks {
+    return {
+        greeter => 'Koha::Plugin::Com::ByWaterSolutions::KitchenSink::Greeter'
+    };
 }
 
 1;
