@@ -12,7 +12,7 @@ use C4::Context;
 
 use Koha::Account::Lines;
 use Koha::Account;
-use Koha::DateUtils;
+use Koha::DateUtils qw( dt_from_string );
 use Koha::Libraries;
 use Koha::Patron::Categories;
 use Koha::Patron;
