@@ -676,4 +676,16 @@ sub background_tasks {
     };
 }
 
+=head3 transform_prepared_letter
+
+Plugin hook used to modify prepared slips and notices
+
+=cut
+
+sub transform_prepared_letter {
+    my ( $self, $params ) = @_;
+    my $linebreak = $params->{letter}->{is_html} ? '<p>' : "\n";
+    $params->{letter}->{content} .= $linebreak . "Thanks for using your local library!";
+}
+
 1;
