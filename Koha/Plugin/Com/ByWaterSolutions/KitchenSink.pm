@@ -99,6 +99,22 @@ sub tool {
     }
 }
 
+## The existance of an 'admin' subroutine means the plugin has some functionality that
+## should only be available to Koha librarians with administrative privileges.
+##
+## Such plugins will be displayed in the admin page and work in a similar way to the 'tool'
+## system above.
+sub admin {
+    my ( $self, $args ) = @_;
+
+    my $cgi = $self->{'cgi'};
+
+    my $template = $self->get_template( { file => 'admin_example.tt' } );
+
+    $self->output_html( $template->output() );
+    return;
+}
+
 ## The existiance of a 'to_marc' subroutine means the plugin is capable
 ## of converting some type of file to MARC for use from the stage records
 ## for import tool

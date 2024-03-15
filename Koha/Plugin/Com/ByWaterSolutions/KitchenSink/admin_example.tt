@@ -1,0 +1,36 @@
+[% SET footerjs = 1 %]
+[% INCLUDE 'doc-head-open.inc' %]
+<title>Koha: KitchenSink - Admin</title>
+[% INCLUDE 'doc-head-close.inc' %]
+</head>
+
+<body>
+    [% WRAPPER 'header.inc' %]
+        [% INCLUDE 'prefs-admin-search.inc' %]
+    [% END %]
+
+    <div id="breadcrumbs">
+        <a href="/cgi-bin/koha/mainpage.pl">Home</a>
+        &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a>
+        &rsaquo; KitchenSink
+        &rsaquo; Administration
+    </div>
+
+    <div class="main container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <main>
+                    <h1>Administration demonstration</h1>
+                    <div class="page-section">
+                        <pre>You could do all sorts of administration worthy things on a page like this</pre>
+                    </div>
+
+                    <div class="page-section">
+                        Lots of shiny, shiny things.
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+[% INCLUDE 'intranet-bottom.inc' %]
