@@ -99,18 +99,6 @@ sub tool {
     }
 }
 
-## The existance of a 'admin' subroutine means the plugin is capable
-## of running an admin section for things that should not be accessible
-## for non-admin users
-sub admin {
-    my ( $self, $args ) = @_;
-
-    my $cgi = $self->{'cgi'};
-
-    my $template = $self->get_template({ file => 'admin.tt' });
-    $self->output_html( $template->output() );
-}
-
 ## The existiance of a 'to_marc' subroutine means the plugin is capable
 ## of converting some type of file to MARC for use from the stage records
 ## for import tool
