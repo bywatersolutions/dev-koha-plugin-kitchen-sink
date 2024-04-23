@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        koha-version: [master, stable, oldstable]
+        koha-version: [main, stable, oldstable]
 
     steps:
 
@@ -74,7 +74,7 @@ jobs:
         echo "KOHA_INTRANET_URL=$KOHA_INTRANET_URL" >> $GITHUB_ENV
         echo "KOHA_MARC_FLAVOUR=$KOHA_MARC_FLAVOUR" >> $GITHUB_ENV
         echo "RUN_TESTS_AND_EXIT=no" >> $GITHUB_ENV
-        echo "KOHA_IMAGE=master" >> $GITHUB_ENV
+        echo "KOHA_IMAGE=main" >> $GITHUB_ENV
         echo "GITHUB REPO: $GITHUB_REPO"
         echo "ROOT DIR: $ROOT_DIR"
         echo "SYNC_REPO: $SYNC_REPO"
@@ -83,9 +83,9 @@ jobs:
     - name: Set up koha-testing-docker
       run: |
         sudo sysctl -w vm.max_map_count=262144
-        wget -O docker-compose.yml https://gitlab.com/koha-community/koha-testing-docker/raw/master/docker-compose.yml
+        wget -O docker-compose.yml https://gitlab.com/koha-community/koha-testing-docker/raw/main/docker-compose.yml
         mkdir -p env
-        wget -O env/defaults.env https://gitlab.com/koha-community/koha-testing-docker/raw/master/env/defaults.env
+        wget -O env/defaults.env https://gitlab.com/koha-community/koha-testing-docker/raw/main/env/defaults.env
         cp env/defaults.env .env
         docker-compose pull
 #    - name: Setup Debug Session
