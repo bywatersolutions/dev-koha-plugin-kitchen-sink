@@ -119,7 +119,6 @@ jobs:
     - name: Post test cleanup
       run: |
         docker compose down
-        docker rm -f $(docker ps -a -f "name=koha_" -q)
         docker volume prune -f
         docker image  prune -f
         rm docker-compose.yml
