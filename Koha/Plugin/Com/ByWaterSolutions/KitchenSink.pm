@@ -619,7 +619,7 @@ in process_message_queue.pl
 sub before_send_messages {
     my ( $self, $params ) = @_;
 
-    print "Plugin hook before_send_message called with the params: " . Data::Dumper::Dumper( $params );
+    warn "Plugin hook before_send_message called with the params: " . Data::Dumper::Dumper( $params );
 }
 
 =head3 item_barcode_transform
