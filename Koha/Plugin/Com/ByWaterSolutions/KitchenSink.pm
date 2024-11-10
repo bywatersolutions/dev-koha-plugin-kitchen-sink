@@ -405,8 +405,8 @@ sub report_step1 {
 
     my $template = $self->get_template({ file => 'report-step1.tt' });
 
-    my @libraries = Koha::Libraries->search;
-    my @categories = Koha::Patron::Categories->search({}, {order_by => ['description']});
+    my @libraries = Koha::Libraries->search->as_list;
+    my @categories = Koha::Patron::Categories->search({}, {order_by => ['description']})->as_list;
     $template->param(
         libraries => \@libraries,
         categories => \@categories,
