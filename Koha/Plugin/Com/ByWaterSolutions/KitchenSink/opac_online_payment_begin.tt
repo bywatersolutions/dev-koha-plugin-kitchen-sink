@@ -72,6 +72,7 @@
 
 
                     <form method="post" action="[% OPACBaseURL %]/cgi-bin/koha/opac-account-pay-return.pl">
+                        [% INCLUDE 'csrf-token.inc' %]
                         <input type="hidden" name="BillingAddress" value="[% borrower.address %]" />
                         <input type="hidden" name="BillingName" value="[% borrower.firstname %] [% borrower.surname %]" />
                         <input type="hidden" name="BillingCountry" value="US" />
