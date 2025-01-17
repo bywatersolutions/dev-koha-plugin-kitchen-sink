@@ -317,8 +317,8 @@ sub intranet_catalog_biblio_enhancements_toolbar_button {
     my ( $self ) = @_;
 
     return q|
-        <a class="btn btn-default btn-sm" onclick="alert('Peace and long life');">
-          <i class="fa fa-hand-spock-o" aria-hidden="true"></i>
+        <a class="btn btn-default" role="button" tabindex="0" onclick="alert('Peace and long life');">
+          <i class="fa fa-hand-spock" aria-hidden="true"></i>
           Live long and prosper
         </a>
     |;
