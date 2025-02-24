@@ -477,7 +477,7 @@ sub report_step2 {
     $template->param(
         date_ran     => dt_from_string(),
         results_loop => \@results,
-        branch       => GetBranchName($branch),
+        branch       => Koha::Libraries->find($branch)->branchname,
     );
 
     unless ( $category_code eq '%' ) {
