@@ -15,7 +15,8 @@
     <form method="post">
         <input type="hidden" name="class" value="[% CLASS | html %]"/>
         <input type="hidden" name="method" value="[% METHOD | html %]"/>
-
+        <input type="hidden" name="op" value="cud-clickme" />
+        [% INCLUDE 'csrf-token.inc' %]
         <br/>
 
         <input name="submitted" type="submit" value="Click me" />
@@ -26,6 +27,8 @@
     <form method="post">
         <input type="hidden" name="class" value="[% CLASS | html %]"/>
         <input type="hidden" name="method" value="[% METHOD | html %]"/>
+        [% INCLUDE 'csrf-token.inc' %]
+        <input type="hidden" name="op" value="cud-schedule"/>
 
         <br/>
         <input type="number" name="count" value="6" />

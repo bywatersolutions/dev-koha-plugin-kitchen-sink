@@ -81,6 +81,8 @@
                         <input type="hidden" name="BillingEmail" value="[% borrower.email | html %]" />
                         <input type="hidden" name="amount" value="[% total | format('%.2f') %]" />
                         <input type="hidden" name="payment_method" value="Koha::Plugin::Com::ByWaterSolutions::KitchenSink" />
+                        <input type="hidden" name="op" value="cud-confirm" />
+                        [% INCLUDE 'csrf-token.inc' %]
 
                         [% FOREACH a IN accountlines %]
                             <input type="hidden" name="accountlines_id" value="[% a.id | html %]" />
