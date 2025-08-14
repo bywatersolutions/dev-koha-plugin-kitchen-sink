@@ -9,11 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Modernize GitHub Actions workflow
 - Update actions/checkout from v1 to v4
 - Update bywatersolutions/github-action-koha-get-version-by-label from @master to @v2
+- Update bywatersolutions/github-action-koha-plugin-create-kpz from @master to @v3
 - Replace deprecated ::set-output with $GITHUB_OUTPUT syntax
 - Migrate from manual Docker setup to koha-testing-docker (KTD)
 - Improve test execution with prove recursive and shuffle options
 - Add proper error handling and container lifecycle management
 - Remove extensive debug output for cleaner CI logs
+- Eliminate all GitHub Actions deprecation warnings
 
 ## [2.1.43] - 2021-03-01
 ### Changed
