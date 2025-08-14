@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.2] - 2025-08-14
+### Added
+- GitHub UI release sync workflow - allows creating releases through GitHub interface
+- Automatic version synchronization when releases are created via GitHub UI
+- Support for both command-line and web-based release workflows
+
 ## [2.6.1] - 2025-08-14
 ### Changed
 - Modernize build system with Gulp 4.x and async/await patterns

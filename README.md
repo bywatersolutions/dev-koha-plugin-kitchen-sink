@@ -44,9 +44,13 @@ npm run build
 
 # Releasing New Versions
 
-This plugin uses `npm version` for automated release management. This approach ensures consistent versioning and eliminates manual errors.
+This plugin supports two release workflows: **Command Line** (recommended for developers) and **GitHub UI** (for maintainers).
 
-## Creating a Release
+## Method 1: Command Line Release (Recommended)
+
+Use `npm version` for automated release management. This approach ensures consistent versioning and eliminates manual errors.
+
+### Creating a Release
 
 ```bash
 # Create a new patch release (e.g., 2.6.0 -> 2.6.1)
@@ -59,7 +63,7 @@ npm version minor
 npm version major
 ```
 
-## What Happens Automatically
+### What Happens Automatically
 
 When you run `npm version`, the following occurs automatically:
 
@@ -68,7 +72,7 @@ When you run `npm version`, the following occurs automatically:
 3. **Git Commit**: Creates a commit with the version change
 4. **Git Tag**: Creates a git tag for the new version
 
-## Publishing the Release
+### Publishing the Release
 
 After running `npm version`, push the changes and tag to trigger the automated release:
 
@@ -82,10 +86,35 @@ This will trigger the GitHub Actions workflow to:
 2. Build the kpz file
 3. Create a GitHub release with the kpz file attached
 
+## Method 2: GitHub UI Release
+
+Maintainers can also create releases directly through GitHub's web interface:
+
+1. **Go to Releases**: Navigate to the [Releases page](https://github.com/bywatersolutions/koha-plugin-kitchen-sink/releases)
+2. **Create Release**: Click "Create a new release"
+3. **Set Tag**: Create a new tag following the format `v2.6.2` (with 'v' prefix)
+4. **Add Details**: Fill in release title and description
+5. **Publish**: Click "Publish release"
+
+### What Happens Automatically
+
+When you create a release through GitHub UI:
+
+1. **Version Sync**: GitHub Actions automatically syncs the version to `package.json` and plugin file
+2. **Build**: Builds the kpz file
+3. **Upload**: Attaches the kpz file to the release
+
+**Note**: The version sync workflow will commit the version changes back to the main branch.
+
 ## Version Guidelines
 
-- **Patch** (`npm version patch`): Bug fixes, small improvements
-- **Minor** (`npm version minor`): New features, backwards-compatible changes
-- **Major** (`npm version major`): Breaking changes, major rewrites
+- **Patch** (x.x.1): Bug fixes, small improvements
+- **Minor** (x.1.x): New features, backwards-compatible changes  
+- **Major** (1.x.x): Breaking changes, major rewrites
 
-The automated workflow ensures that every release is properly tested and documented.
+## Tag Format
+
+- **Command Line**: Creates tags like `v2.6.1` automatically
+- **GitHub UI**: Use format `v2.6.1` (with 'v' prefix) for consistency
+
+The automated workflows ensure that every release is properly tested, versioned, and documented regardless of which method you choose.
