@@ -86,11 +86,7 @@ jobs:
       run: npm run build
 
     - name: Upload kpz to release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v2
       with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./koha-plugin-kitchen-sink-v${{ steps.version.outputs.version }}.kpz
-        asset_name: koha-plugin-kitchen-sink-v${{ steps.version.outputs.version }}.kpz
-        asset_content_type: application/zip
+        files: ./koha-plugin-kitchen-sink-v${{ steps.version.outputs.version }}.kpz
+        tag_name: ${{ github.ref_name }}
