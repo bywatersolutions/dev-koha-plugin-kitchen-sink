@@ -128,7 +128,7 @@ jobs:
 
     - name: Build Koha Plugin kpz artifact
       id: kpz
-      uses: "bywatersolutions/github-action-koha-plugin-create-kpz@master"
+      uses: "bywatersolutions/github-action-koha-plugin-create-kpz@v3"
       with:
         release-version: ${{ steps.myvars.outputs.tag_version }}
         release-name: ${{ steps.myvars.outputs.github_repo }}
