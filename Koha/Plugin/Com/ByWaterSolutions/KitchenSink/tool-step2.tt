@@ -10,14 +10,14 @@
 
 <div id="doc3">
 
-    <p>Hello [% victim.firstname %]! Your new name is Bob!</p>
+    <p>Hello [% victim.firstname | html %]! Your new name is Bob!</p>
 
     [% IF victims %]
         <h3>Previous victims:</h3>
 
         <ul>
             [% FOREACH v IN victims %]
-                <li><a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=[% v.borrowernumber %]">[% v.firstname %] [% v.surname %]</a></li>
+                <li><a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=[% v.borrowernumber | uri %]">[% v.firstname | html %] [% v.surname | html %]</a></li>
             [% END %]
         </ul>
     [% ELSE %]

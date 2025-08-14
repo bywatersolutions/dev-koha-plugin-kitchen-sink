@@ -15,14 +15,14 @@
 
         <!-- Notice our form here has no 'action', this is good, it means that our forms will always get passed back to 'plugins/run.pl'. You could hard code it instead if you prefer -->
 	<form method="get">
-                <input type="hidden" name="class" value="[% CLASS %]"/>
-                <input type="hidden" name="method" value="[% METHOD %]"/>
+                <input type="hidden" name="class" value="[% CLASS | html %]"/>
+                <input type="hidden" name="method" value="[% METHOD | html %]"/>
 
 		<label for="branch">Select Library:</label>
 		<select name="branch">
 			[% FOREACH library IN libraries %]
-				<option	value="[% library.branchcode %]">
-					[% library.branchname %]
+				<option	value="[% library.branchcode | html %]">
+					[% library.branchname | html %]
 				</option>
 			[% END %]
 		</select>
@@ -33,7 +33,7 @@
 		<select name="categorycode">
 			<option value="%">Any</option>
 			[% FOREACH category IN categories %]
-				<option value="[% category.categorycode %]">[% category.description %]</option>
+				<option value="[% category.categorycode | html %]">[% category.description | html %]</option>
 			[% END %]
 		</select>
 

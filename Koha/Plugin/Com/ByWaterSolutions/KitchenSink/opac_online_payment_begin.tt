@@ -1,7 +1,7 @@
 [% USE Koha %]
 [% USE KohaDates %]
 
-[% INCLUDE 'doc-head-open.inc' %][% IF ( LibraryNameTitle ) %][% LibraryNameTitle %][% ELSE %]Koha online[% END %] catalog &rsaquo; Pay your fines and charges
+[% INCLUDE 'doc-head-open.inc' %][% IF ( LibraryNameTitle ) %][% LibraryNameTitle | html %][% ELSE %]Koha online[% END %] catalog &rsaquo; Pay your fines and charges
 [% INCLUDE 'doc-head-close.inc' %]
 [% BLOCK cssinclude %][% END %]
 </head>
@@ -11,7 +11,7 @@
 <div class="main">
     <ul class="breadcrumb">
         <li><a href="/cgi-bin/koha/opac-main.pl">Home</a> <span class="divider">&rsaquo;</span></li>
-        <li><a href="/cgi-bin/koha/opac-user.pl">[% borrower.firstname %] [% borrower.surname %]</a><span class="divider">&rsaquo;</span></li>
+        <li><a href="/cgi-bin/koha/opac-user.pl">[% borrower.firstname | html %] [% borrower.surname | html %]</a><span class="divider">&rsaquo;</span></li>
         <li><a href="#">Pay your fines and charges</a></li>
     </ul>
 
@@ -72,18 +72,18 @@
 
 
                     <form method="post" action="[% OPACBaseURL %]/cgi-bin/koha/opac-account-pay-return.pl">
-                        <input type="hidden" name="BillingAddress" value="[% borrower.address %]" />
-                        <input type="hidden" name="BillingName" value="[% borrower.firstname %] [% borrower.surname %]" />
+                        <input type="hidden" name="BillingAddress" value="[% borrower.address | html %]" />
+                        <input type="hidden" name="BillingName" value="[% borrower.firstname | html %] [% borrower.surname | html %]" />
                         <input type="hidden" name="BillingCountry" value="US" />
-                        <input type="hidden" name="BillingCity" value="[% borrower.city %]" />
-                        <input type="hidden" name="BillingState" value="[% borrower.state %]" />
-                        <input type="hidden" name="BillingPostalCode" value="[% borrower.zipcode %]" />
-                        <input type="hidden" name="BillingEmail" value="[% borrower.email %]" />
+                        <input type="hidden" name="BillingCity" value="[% borrower.city | html %]" />
+                        <input type="hidden" name="BillingState" value="[% borrower.state | html %]" />
+                        <input type="hidden" name="BillingPostalCode" value="[% borrower.zipcode | html %]" />
+                        <input type="hidden" name="BillingEmail" value="[% borrower.email | html %]" />
                         <input type="hidden" name="amount" value="[% total | format('%.2f') %]" />
                         <input type="hidden" name="payment_method" value="Koha::Plugin::Com::ByWaterSolutions::KitchenSink" />
 
                         [% FOREACH a IN accountlines %]
-                            <input type="hidden" name="accountlines_id" value="[% a.id %]" />
+                            <input type="hidden" name="accountlines_id" value="[% a.id | html %]" />
                         [% END %]
 
                         <input type="submit" class="btn" value="Yes, proceed with payment" />

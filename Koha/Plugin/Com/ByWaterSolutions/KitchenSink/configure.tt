@@ -17,8 +17,8 @@
     <!-- Notice our form here has no 'action', this is good, it means that our forms will always get passed back to 'plugins/run.pl'. You could hard code it instead if you prefer -->
     <form method="get">
         <!-- Always pass these two parameters so the plugin system knows what to execute! -->
-        <input type="hidden" name="class" value="[% CLASS %]"/>
-        <input type="hidden" name="method" value="[% METHOD %]"/>
+        <input type="hidden" name="class" value="[% CLASS | html %]"/>
+        <input type="hidden" name="method" value="[% METHOD | html %]"/>
 
         <label for="foo">Parameter 'foo': </label>
         <select name="foo">
@@ -38,7 +38,7 @@
         <p>
 
         <label for="bar">Parameter 'bar': </label>
-        <input type="text" name="bar" value="[% bar %]" />
+        <input type="text" name="bar" value="[% bar | html %]" />
 
         <p>
 

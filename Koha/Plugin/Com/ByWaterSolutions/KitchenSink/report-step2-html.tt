@@ -12,12 +12,12 @@
 <div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a> &rsaquo; Kitchen Sink &rsaquo; Report &rsaquo; Patron List</div>
 
 <div id="doc3">
-<h5>Library: [% branch %]</h5>
+<h5>Library: [% branch | html %]</h5>
 [% IF category_code %]
-	<h5>Category Code: [% category_code %]</h5>
+	<h5>Category Code: [% category_code | html %]</h5>
 [% END %]
 [% IF borrower_municipality %]
-	<h5>Municipality: [% borrower_municipality %]</h5>
+	<h5>Municipality: [% borrower_municipality | html %]</h5>
 [% END %]
 <h5>Date Ran: [% date_ran | $KohaDates %]</h5>
 
@@ -35,10 +35,10 @@
   <tbody>
     [% FOREACH r IN results_loop %]
       <tr>
-        <td>[% r.firstname %] [% r.surname %]</td>
-        <td>[% r.address %]</td>
-        <td>[% r.city %]</td>
-        <td>[% r.zipcode %]</td>
+        <td>[% r.firstname | html %] [% r.surname | html %]</td>
+        <td>[% r.address | html %]</td>
+        <td>[% r.city | html %]</td>
+        <td>[% r.zipcode | html %]</td>
         <td>[% r.dateexpiry | $KohaDates %]</td> 
       </tr>
     [% END %]
