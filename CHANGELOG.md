@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add proper error handling and container lifecycle management
 - Remove extensive debug output for cleaner CI logs
 - Eliminate all GitHub Actions deprecation warnings
+- Update workflow and scripts to use main as default branch instead of master
 
 ## [2.1.43] - 2021-03-01
 ### Changed
