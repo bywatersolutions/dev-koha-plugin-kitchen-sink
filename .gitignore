@@ -1,1 +1,4 @@
+*.kpz
+node_modules/
+package-lock.json
 .vstags

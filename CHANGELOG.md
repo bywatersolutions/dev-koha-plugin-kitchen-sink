@@ -5,6 +5,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [2.6.1] - 2025-08-14
+### Changed
+- Modernize build system with Gulp 4.x and async/await patterns
+- Replace increment_version.js with npm version workflow for automated releases
+- Update package.json with modern npm scripts and clean dependencies
+- Remove legacy deploy.sh script in favor of GitHub Actions releases
+- Add comprehensive development documentation to README
+- Simplify and modernize gulpfile.js structure
+- Add proper .gitignore for node_modules and build artifacts
+
+### Added
+- npm scripts for version management and kpz filename generation
+- Automated version updating in plugin files via preversion hook
+- Development and release workflow documentation
+
+### Removed
+- increment_version.js (replaced by npm version workflow)
+- deploy.sh (replaced by GitHub Actions)
+- Unused dependencies and package.json overrides
+
+## [2.6.0] - 2025-08-14
 ### Changed
 - Modernize GitHub Actions workflow
 - Update actions/checkout from v1 to v4

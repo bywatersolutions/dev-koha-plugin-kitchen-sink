@@ -21,3 +21,71 @@ To set up the Koha plugin system you must first make some changes to your instal
 * Restart your webserver
 
 Once set up is complete you will need to alter your UseKohaPlugins system preference. On the Tools page you will see the Tools Plugins and on the Reports page you will see the Reports Plugins.
+
+# Development
+
+## Building the Plugin
+
+The plugin uses a modern Gulp-based build system:
+
+```bash
+# Install dependencies
+npm install
+
+# Build the plugin kpz file
+npm run build
+```
+
+## Available npm Scripts
+
+- `npm run kpz` - Print the kpz filename for the current version
+- `npm run print-name` - Print the package name
+- `npm run build` - Build the plugin (via Gulp)
+
+# Releasing New Versions
+
+This plugin uses `npm version` for automated release management. This approach ensures consistent versioning and eliminates manual errors.
+
+## Creating a Release
+
+```bash
+# Create a new patch release (e.g., 2.6.0 -> 2.6.1)
+npm version patch
+
+# Create a new minor release (e.g., 2.6.0 -> 2.7.0)
+npm version minor
+
+# Create a new major release (e.g., 2.6.0 -> 3.0.0)
+npm version major
+```
+
+## What Happens Automatically
+
+When you run `npm version`, the following occurs automatically:
+
+1. **Version Update**: Updates the version in `package.json`
+2. **Plugin File Update**: Updates the `$VERSION` variable in the main plugin file
+3. **Git Commit**: Creates a commit with the version change
+4. **Git Tag**: Creates a git tag for the new version
+
+## Publishing the Release
+
+After running `npm version`, push the changes and tag to trigger the automated release:
+
+```bash
+# Push changes and tags to GitHub
+git push origin main --follow-tags
+```
+
+This will trigger the GitHub Actions workflow to:
+1. Run tests on all supported Koha versions
+2. Build the kpz file
+3. Create a GitHub release with the kpz file attached
+
+## Version Guidelines
+
+- **Patch** (`npm version patch`): Bug fixes, small improvements
+- **Minor** (`npm version minor`): New features, backwards-compatible changes
+- **Major** (`npm version major`): Breaking changes, major rewrites
+
+The automated workflow ensures that every release is properly tested and documented.
