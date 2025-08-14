@@ -17,6 +17,11 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
 
+    - name: Checkout main branch
+      run: |
+        git checkout main
+        git pull origin main
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
@@ -40,18 +45,34 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
+    - name: Check if version sync is needed
+      id: check
+      run: |
+        CURRENT_VERSION=$(node -p "require('./package.json').version")
+        TARGET_VERSION="${{ steps.version.outputs.version }}"
+        if [ "$CURRENT_VERSION" = "$TARGET_VERSION" ]; then
+          echo "needs_sync=false" >> $GITHUB_OUTPUT
+          echo "Version already matches: $CURRENT_VERSION"
+        else
+          echo "needs_sync=true" >> $GITHUB_OUTPUT
+          echo "Version sync needed: $CURRENT_VERSION -> $TARGET_VERSION"
+        fi
+
     - name: Update package.json version
+      if: steps.check.outputs.needs_sync == 'true'
       run: |
         # Update package.json version to match the release tag
         npm version ${{ steps.version.outputs.version }} --no-git-tag-version
 
     - name: Update plugin file version
+      if: steps.check.outputs.needs_sync == 'true'
       run: |
         # Run the preversion script logic manually to update plugin file
         sed -i -e "s/^our \$VERSION = .*/our \$VERSION = \"${{ steps.version.outputs.version }}\";/" Koha/Plugin/Com/ByWaterSolutions/KitchenSink.pm
         rm -f Koha/Plugin/Com/ByWaterSolutions/KitchenSink.pm-e
 
     - name: Commit version updates
+      if: steps.check.outputs.needs_sync == 'true'
       run: |
         git add package.json package-lock.json Koha/Plugin/Com/ByWaterSolutions/KitchenSink.pm
         if git diff --staged --quiet; then
