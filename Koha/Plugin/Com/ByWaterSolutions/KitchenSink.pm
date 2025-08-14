@@ -27,7 +27,7 @@ use URI::Escape qw(uri_unescape);
 use Koha::Plugin::Com::ByWaterSolutions::KitchenSink::Greeter;
 
 ## Here we set our plugin version
-our $VERSION = "{VERSION}";
+our $VERSION = "2.6.1";
 our $MINIMUM_VERSION = "{MINIMUM_VERSION}";
 
 ## Here is our metadata, some keys are required, some are optional
