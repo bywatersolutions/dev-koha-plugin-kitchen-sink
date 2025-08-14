@@ -1,12 +1,12 @@
 name: CI
 on:
   push:
+  pull_request:
     branches:
       - master
-    tags:
-      - 'v*.*.*'
   schedule:
     - cron: "0 6 * * *"
+
 jobs:
   unit_tests:
     name: Run unit tests
@@ -17,112 +17,75 @@ jobs:
         koha-version: [main, stable, oldstable]
 
     steps:
-
-    - name: Is a tag?
-      run: |
-        echo "${{ startsWith(github.ref, 'refs/tags/v') }}"
-
-    - name: GitHub Ref 1
-      run: |
-        echo "${GITHUB_REF##*/}"
-
-    - name: GitHub Ref 2
-      run: |
-        echo "${{ github.event.ref }}"
-
-    - name: GitHub Ref 3
-      run: |
-        echo "${{ github.ref }}"
-
-    - name: Dump env
-      run: env | sort
-
-    - name: Dump GitHub context
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
-      run: echo "$GITHUB_CONTEXT"
-
-    - uses: actions/checkout@v1
+    - name: Checkout plugin code
+      uses: actions/checkout@v4
 
     - name: Get Koha Version Branch Name
       id: koha-version
-      uses: "bywatersolutions/github-action-koha-get-version-by-label@master"
+      uses: "bywatersolutions/github-action-koha-get-version-by-label@v2"
       with:
         version-label: "${{ matrix.koha-version }}"
+
+    - name: Set up environment variables
+      run: |
+        IFS='/' read -r -a parts <<< "$GITHUB_REPOSITORY"
+        GITHUB_REPO="${parts[1]}"
+        echo "GITHUB_REPO=$GITHUB_REPO" >> $GITHUB_ENV
+        echo "KOHA_BRANCH=${{ steps.koha-version.outputs.current-branch-name }}" >> $GITHUB_ENV
+        echo "PLUGINS_DIR=$(pwd)/.." >> $GITHUB_ENV
+        echo "SYNC_REPO=$(pwd)/../kohaclone" >> $GITHUB_ENV
 
     - name: Check out Koha
       run: |
         cd ..
-        git clone --branch ${{ steps.koha-version.outputs.current-branch-name }} --single-branch --depth 1 https://github.com/Koha-Community/Koha.git kohaclone
-      
-    - name: Export additional variables needed by koha-testing-docker
+        git clone --branch ${{ env.KOHA_BRANCH }} --single-branch --depth 1 https://github.com/Koha-Community/Koha.git kohaclone
+
+    - name: Install koha-testing-docker
       run: |
         cd ..
-        pwd
-        ls -alh
-        IFS='/' read -r -a parts <<< "$GITHUB_REPOSITORY"
-        export GITHUB_REPO="${parts[1]}"
-        export ROOT_DIR="$(pwd)"
-        export LOCAL_USER_ID="$(id -u)" # Needed for koha-testing-docker
-        export SYNC_REPO="$ROOT_DIR/kohaclone"
-        export KOHA_INTRANET_URL="http://127.0.0.1:8081"
-        export KOHA_MARC_FLAVOUR="marc21"
-        echo "GITHUB_REPO=$GITHUB_REPO" >> $GITHUB_ENV
-        echo "ROOT_DIR=$ROOT_DIR" >> $GITHUB_ENV
-        echo "LOCAL_USER_ID=$LOCAL_USER_ID" >> $GITHUB_ENV
-        echo "SYNC_REPO=$SYNC_REPO" >> $GITHUB_ENV
-        echo "KOHA_INTRANET_URL=$KOHA_INTRANET_URL" >> $GITHUB_ENV
-        echo "KOHA_MARC_FLAVOUR=$KOHA_MARC_FLAVOUR" >> $GITHUB_ENV
-        echo "RUN_TESTS_AND_EXIT=no" >> $GITHUB_ENV
-        echo "KOHA_IMAGE=main" >> $GITHUB_ENV
-        echo "GITHUB REPO: $GITHUB_REPO"
-        echo "ROOT DIR: $ROOT_DIR"
-        echo "SYNC_REPO: $SYNC_REPO"
-        ls -alh $SYNC_REPO
-
-    - name: Set up koha-testing-docker
-      run: |
-        sudo sysctl -w vm.max_map_count=262144
-        wget -O docker-compose.yml https://gitlab.com/koha-community/koha-testing-docker/raw/main/docker-compose.yml
-        mkdir -p env
-        wget -O env/defaults.env https://gitlab.com/koha-community/koha-testing-docker/raw/main/env/defaults.env
+        git clone https://gitlab.com/koha-community/koha-testing-docker.git
+        cd koha-testing-docker
         cp env/defaults.env .env
-        docker compose pull
-#    - name: Setup Debug Session
-#      uses: csexton/debugger-action@master
+        echo "$(pwd)/bin" >> $GITHUB_PATH
 
-    - name: Run tests
+    - name: Launch KTD instance with plugins support
       run: |
-        pwd
-        ls -alh
-        docker compose -f docker-compose.yml -p koha up --detach
-        cd ..
-        pwd
-        ls -alh
-        echo "`date`: Installing YAML::Syck, needed for Koha 20.11 and earlier"
-        docker exec koha-koha-1 apt-get install -y libyaml-syck-perl libemail-valid-perl libmojo-jwt-perl
-        while [ $? -ne 0 ]; do echo "INSTALL YAML::Syck" && docker exec koha-koha-1 apt-get install -y libyaml-syck-perl libemail-valid-perl; done
-        echo "SLEEPING 3 MINUTES"
-        sleep 60
-        echo "1 MINUTE DONE"
-        sleep 60
-        echo "2 MINUTES DONE"
-        sleep 60
-        echo "3 MINUTES DONE"
-        echo "WAKING UP"
-        echo "DOCKER LOGS"
-        docker logs koha-koha-1 2>&1
-        echo "/DOCKER LOGS"
-        docker cp $GITHUB_REPO/. koha-koha-1:/var/lib/koha/kohadev/plugins
-        docker exec koha-koha-1 bash -c 'prove /var/lib/koha/kohadev/plugins/t'
-        
-    - name: Post test cleanup
+        cd ../koha-testing-docker
+        export LOCAL_USER_ID=$(id -u)
+        export KTD_HOME=$(pwd)
+        ktd --name kitchensink --plugins up -d
+
+    - name: Wait for KTD to be ready
       run: |
-        docker compose down
-        docker volume prune -f
-        docker image  prune -f
-        rm docker-compose.yml
-        rm -rf env .env
+        cd ../koha-testing-docker
+        export KTD_HOME=$(pwd)
+        ktd --name kitchensink --wait-ready 120
+
+    - name: Run plugin tests
+      run: |
+        export KTD_HOME=$(pwd)/../koha-testing-docker
+        ktd --name kitchensink --shell --run "
+          cd /kohadevbox/plugins/${{ env.GITHUB_REPO }} &&
+          export PERL5LIB=\$PERL5LIB:. &&
+          prove -v -r -s t/
+        "
+
+    - name: Show logs on failure
+      if: failure()
+      run: |
+        export KTD_HOME=$(pwd)/../koha-testing-docker
+        echo "=== KTD instance status ==="
+        ktd --name kitchensink --list || true
+        echo "=== Koha error logs ==="
+        ktd --name kitchensink --shell --run "tail -50 /var/log/koha/kohadev/plack-intranet-error.log" || true
+        echo "=== Container logs ==="
+        docker logs kitchensink-koha-1 --tail 50 || true
+
+    - name: Cleanup KTD instance
+      if: always()
+      run: |
+        export KTD_HOME=$(pwd)/../koha-testing-docker
+        ktd --name kitchensink down || true
 
   release:
     name: Build & Release
@@ -132,25 +95,25 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
 
     - name: Parse out and store the GitHub repository name
       id: myvars
       run: |
         IFS='/' read -r -a parts <<< "$GITHUB_REPOSITORY"
         GITHUB_REPO="${parts[1]}"
-        echo ::set-output name=github_repo::$GITHUB_REPO
+        echo "github_repo=$GITHUB_REPO" >> $GITHUB_OUTPUT
         echo "GITHUB REPO: $GITHUB_REPO"
 
         TAG_VERSION="${GITHUB_REF##*/}"
         echo "TAG VERSION: $TAG_VERSION"
         TAG_VERSION="${TAG_VERSION:1}"
         echo "TAG VERSION 2: $TAG_VERSION"
-        echo ::set-output name=tag_version::$TAG_VERSION
+        echo "tag_version=$TAG_VERSION" >> $GITHUB_OUTPUT
 
     - name: Get Koha Version Branch Name
       id: koha-version-oldstable
-      uses: "bywatersolutions/github-action-koha-get-version-by-label@master"
+      uses: "bywatersolutions/github-action-koha-get-version-by-label@v2"
       with:
         version-label: "oldstable"
 
@@ -191,7 +154,7 @@ jobs:
     name: Keep Alive
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Check age and push commit if needed
       run: |
         LAST_COMMIT=$( git --no-pager log -1 --format=%ct )

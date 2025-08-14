@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Changed
+- Modernize GitHub Actions workflow
+- Update actions/checkout from v1 to v4
+- Update bywatersolutions/github-action-koha-get-version-by-label from @master to @v2
+- Replace deprecated ::set-output with $GITHUB_OUTPUT syntax
+- Migrate from manual Docker setup to koha-testing-docker (KTD)
+- Improve test execution with prove recursive and shuffle options
+- Add proper error handling and container lifecycle management
+- Remove extensive debug output for cleaner CI logs
+
 ## [2.1.43] - 2021-03-01
 ### Changed
 - Updated Koha community git repo address
