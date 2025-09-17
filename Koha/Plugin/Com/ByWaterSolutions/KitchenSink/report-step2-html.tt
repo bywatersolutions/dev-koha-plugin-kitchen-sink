@@ -1,15 +1,10 @@
 [% USE KohaDates %]
-[% INCLUDE 'doc-head-open.inc' %]
- <title>Koha: Kitchen Sink Plugin: Report: Patron List</title>
+<!-- We can use this wrapper to create plugin pages that have helpful breadcrumbs and the menu. -->
+[% WRAPPER "wrapper-staff-tool-plugin.inc" method="report" plugin_title="Kitchen Sink Plugin: Report Results" %]
  <script type="text/javascript" src="[% PLUGIN_PATH %]/datepicker/js/datepicker.js"></script>
  <link href="[% PLUGIN_PATH %]/datepicker/css/datepicker.css" rel="stylesheet" type="text/css" />
-[% INCLUDE 'doc-head-close.inc' %]
 </head>
 <body>
-[% INCLUDE 'header.inc' %]
-[% INCLUDE 'cat-search.inc' %]
-
-<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a> &rsaquo; Kitchen Sink &rsaquo; Report &rsaquo; Patron List</div>
 
 <div id="doc3">
 <h5>Library: [% branch | html %]</h5>
@@ -45,4 +40,4 @@
   </tbody>
 </table> 
 
-[% INCLUDE 'intranet-bottom.inc' %]
+[% END %]
