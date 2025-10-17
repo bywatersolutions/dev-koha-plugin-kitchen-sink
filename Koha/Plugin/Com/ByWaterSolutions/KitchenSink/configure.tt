@@ -1,14 +1,7 @@
 [% USE KohaDates %]
-[% INCLUDE 'doc-head-open.inc' %]
- <title>Koha: Kitchen Sink Plugin: Configuration</title>
-[% INCLUDE 'doc-head-close.inc' %]
-</head>
+<!-- We can use this wrapper to create plugin pages that have helpful breadcrumbs and the menu. -->
+[% WRAPPER "wrapper-staff-tool-plugin.inc" method="config" plugin_title="Kitchen Sink Plugin: Configuration" %]
 <body>
-[% INCLUDE 'header.inc' %]
-[% INCLUDE 'cat-search.inc' %]
-
-<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a> &rsaquo; Kitchen Sink &rsaquo; Configuration</div>
-
 <div id="doc3">
     <!-- We can access our own plugins resource files using the PLUGIN_PATH variable. -->
     <img src="[% PLUGIN_PATH %]/logo.png" />
@@ -74,5 +67,4 @@
             Plugin has never been upgraded.
         [% END %]
     </p>
-
-[% INCLUDE 'intranet-bottom.inc' %]
+[% END %]
