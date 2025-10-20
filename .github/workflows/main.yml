@@ -53,6 +53,12 @@ jobs:
         cd ../koha-testing-docker
         export LOCAL_USER_ID=$(id -u)
         export KTD_HOME=$(pwd)
+        # Use version-major-minor but handle main branch case
+        if [ "${{ matrix.koha-version }}" = "main" ]; then
+          export KOHA_IMAGE=main
+        else
+          export KOHA_IMAGE=${{ steps.koha-version.outputs.version-major-minor }}
+        fi
         ktd --name kitchensink --plugins up -d
 
     - name: Wait for KTD to be ready
