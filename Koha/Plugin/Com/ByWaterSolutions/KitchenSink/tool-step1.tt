@@ -1,13 +1,7 @@
-[% INCLUDE 'doc-head-open.inc' %]
- <title>Koha: Kitchen Sink Plugin: Example Tool</title>
-[% INCLUDE 'doc-head-close.inc' %]
+<!-- We can use this wrapper to create plugin pages that have helpful breadcrumbs and the menu. -->
+[% WRAPPER "wrapper-staff-tool-plugin.inc" method="tool" plugin_title="Kitchen Sink Plugin: Example Tool" %]
 </head>
 <body>
-[% INCLUDE 'header.inc' %]
-[% INCLUDE 'cat-search.inc' %]
-
-<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a> &rsaquo; Kitchen Sink &rsaquo; Example Tool</div>
-
 <div id="doc3">
     <p>This is an example tool plugin for Koha. It has a button. What does it do? Nobody really knows. Only one way to find out.
 
@@ -36,4 +30,4 @@
         <input name="greet" type="submit" value="Schedule greetings" />
     </form>
 
-[% INCLUDE 'intranet-bottom.inc' %]
+[% END %]
