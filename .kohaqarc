@@ -1,0 +1,2 @@
+commit_subject_pattern: '^(\[#\d+\] |v?\d+\.\d+\.\d+|Automated commit|Merge pull request)'
+commit_subject_error_message: "Commit title must start with '[#XXX] ', be a version tag, automated commit, or merge"
