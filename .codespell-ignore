@@ -1,0 +1,24 @@
+# Codespell ignore file for Kitchen Sink plugin
+# Add words that should be ignored by the spell checker
+
+# Technical terms and proper nouns
+KitchenSink
+API
+OAuth
+JSON
+YAML
+KTD
+Koha
+ByWater
+ByWaterSolutions
+BibLibre
+OpenFifth
+Theke
+
+# Common abbreviations
+config
+configs
+plugin
+plugins
+biblio
+circ
