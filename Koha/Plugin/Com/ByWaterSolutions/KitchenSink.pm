@@ -310,6 +310,19 @@ sub intranet_js {
     |;
 }
 
+## This method allows you to add new html elements to the authority toolbar.
+## You'll want to return a string of raw html here, most likely a button or other
+## toolbar element of some form. See bug 43230 for more details.
+sub intranet_catalog_authority_enhancements_toolbar_button {
+    my ( $self, $args ) = @_;
+    my $label = $args->{'authid'} ? 'Plugin button on authority #' . $args->{'authid'} : 'Plugin button on new authority';
+    return qq|
+        <a class="btn btn-default" role="button" tabindex="0"">
+          $label
+        </a>
+    |;
+}
+
 ## This method allows you to add new html elements to the catalogue toolbar.
 ## You'll want to return a string of raw html here, most likely a button or other
 ## toolbar element of some form. See bug 20968 for more details.
